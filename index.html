@@ -1,0 +1,1315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>빛의 굴절 실험실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: 교과서 탐구활동 지면처럼 — 상단 단계 띠 + 한 번에 한 장면, 실험대(stage)는 밝은 실험 매트 */
+:root{
+  --bg:#eef5f7; --surface:#ffffff; --surface-2:#e3eef2; --fg:#1b2a33; --muted:#566c78; --line:#c9dce3;
+  --teal:#1597ad; --teal-ink:#0b6f80; --teal-soft:#d4eef3;
+  --volt:#2c5cc9; --glow:#ffc531; --glow-soft:#fff3c4;
+  --ok:#1f8a4c; --ok-soft:#dcf3e5; --bad:#c8373d; --bad-soft:#fbe1e2;
+  --stage:#f7f9fa; --stage-line:#d6dee3; --paper:#ffffff;
+  --display:"Jua","Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b21; --surface:#172830; --surface-2:#1e333d; --fg:#e4f0f4; --muted:#9db4be; --line:#2c4552;
+  --teal:#3cc0d6; --teal-ink:#7fdcec; --teal-soft:#183f49;
+  --volt:#7ea2ff; --glow:#ffcf4d; --glow-soft:#463b12;
+  --ok:#5bd38c; --ok-soft:#173a27; --bad:#ff7b80; --bad-soft:#47201f;
+  --stage:#e9eef1; --stage-line:#b9c6cd; --paper:#f4f7f8; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1b21; --surface:#172830; --surface-2:#1e333d; --fg:#e4f0f4; --muted:#9db4be; --line:#2c4552;
+  --teal:#3cc0d6; --teal-ink:#7fdcec; --teal-soft:#183f49;
+  --volt:#7ea2ff; --glow:#ffcf4d; --glow-soft:#463b12;
+  --ok:#5bd38c; --ok-soft:#173a27; --bad:#ff7b80; --bad-soft:#47201f;
+  --stage:#e9eef1; --stage-line:#b9c6cd; --paper:#f4f7f8; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:20px 60px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.25}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--glow);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-bottom:18px}
+.badge{font-family:var(--display);background:var(--teal);color:#fff;border-radius:18px 18px 18px 4px;padding:8px 14px;font-size:1.25rem;line-height:1.1;text-align:center}
+.top-text{flex:1;min-width:0}
+.top-text .kicker{color:var(--teal-ink);font-family:var(--display);font-size:1rem}
+.top-text h1{font-size:clamp(1.5rem,3.4vw,2.2rem)}
+.top-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.85rem;color:var(--muted)}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.85rem;color:var(--muted)}
+.ghost:hover{border-color:var(--teal);color:var(--teal-ink)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-bottom:22px}
+.steps button{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.steps .n{font-family:var(--display);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);font-size:1rem}
+.steps .t{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.steps button[aria-current="step"]{border-color:var(--teal);background:var(--teal-soft)}
+.steps button[aria-current="step"] .n{background:var(--teal);color:#fff}
+.steps button.done .n{background:var(--ok);color:#fff}
+@media (max-width:640px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* sections */
+.scene{display:flex;flex-direction:column;gap:18px}
+.scene-head{display:flex;flex-direction:column;gap:6px}
+.tag{align-self:flex-start;font-family:var(--display);font-size:.95rem;color:#fff;background:var(--teal);padding:2px 12px;border-radius:999px}
+.scene-head h2{font-size:clamp(1.4rem,3vw,1.9rem)}
+.lead{color:var(--muted);margin:0;max-width:65ch}
+.q{display:flex;gap:10px;align-items:flex-start;font-size:1.08rem;margin:0}
+.q .num{flex:none;font-family:var(--display);width:28px;height:28px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:.95rem;margin-top:1px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.row-end{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{border:none;border-radius:14px;padding:11px 20px;font-family:var(--display);font-size:1.08rem;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.07)}
+.btn.alt{background:var(--surface-2);color:var(--fg)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+/* supplies */
+.supply-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.supply-layout{grid-template-columns:1fr}}
+.supply-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.supply{background:var(--paper);border:2px solid var(--stage-line);border-radius:16px;padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .15s,border-color .15s}
+.supply:hover{transform:translateY(-2px);border-color:var(--teal)}
+.supply svg{height:78px;width:100%;max-width:112px}
+.supply .nm{font-family:var(--display);font-size:.98rem;color:#7b8f99;line-height:1.2;text-align:center;min-height:2.4em;display:grid;place-items:center}
+.supply.seen .nm{color:#0b6f80}
+.supply.active{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.detail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;min-height:300px;justify-content:center}
+.detail .big{background:var(--paper);border-radius:16px;width:100%;display:grid;place-items:center;padding:16px;border:1px solid var(--stage-line)}
+.detail .big svg{height:170px;width:100%;max-width:230px}
+.detail h3{font-size:1.8rem;color:var(--teal-ink)}
+.detail p{margin:0;max-width:34ch}
+.detail .use{font-size:.92rem;color:var(--muted)}
+.progress{font-family:var(--display);color:var(--teal-ink)}
+.pop{animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.92);opacity:.4}100%{transform:none;opacity:1}}
+
+/* prediction */
+.pred-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.pred-grid{grid-template-columns:1fr}}
+.pcard{position:relative;border-radius:16px;overflow:hidden;background:var(--paper);line-height:0}
+.pcard img{width:100%;height:auto;display:block}
+.check{position:absolute;border:3px solid #8aa0ab;border-radius:6px;background:#fff;display:grid;place-items:center;padding:0;line-height:1}
+.check:hover{border-color:var(--teal)}
+.check svg{width:80%;height:80%;opacity:0;transform:scale(.6);transition:.15s}
+.check[aria-pressed="true"]{border-color:var(--bad)}
+.check[aria-pressed="true"] svg{opacity:1;transform:none}
+.hint{font-size:.92rem;color:var(--muted)}
+
+/* lab */
+.cardtabs{display:flex;gap:8px;flex-wrap:wrap}
+.cardtabs button{font-family:var(--display);font-size:1.3rem;width:62px;height:52px;border-radius:14px;border:2px solid var(--line);background:var(--surface);position:relative}
+.cardtabs button[aria-selected="true"]{background:var(--teal);color:#fff;border-color:var(--teal)}
+.cardtabs button:disabled{opacity:.4;cursor:not-allowed}
+.cardtabs .mark{position:absolute;top:-9px;right:-14px;padding:0 6px;height:20px;border-radius:999px;font-size:.75rem;display:grid;place-items:center;color:#fff;font-family:var(--body)}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.9fr);gap:16px;align-items:start}
+@media (max-width:860px){.lab{grid-template-columns:1fr}}
+.ref{display:flex;flex-direction:column;gap:10px}
+.ref figure{margin:0;background:var(--paper);border-radius:14px;overflow:hidden;line-height:0;border:1px solid var(--stage-line)}
+.ref figure img{width:100%;height:auto}
+.ref figcaption{line-height:1.4;font-size:.85rem;color:#566c78;padding:6px 10px;background:var(--paper)}
+.howto{margin:0;padding-left:1.2em;font-size:.95rem;display:flex;flex-direction:column;gap:4px}
+.stagebox{display:flex;flex-direction:column;gap:10px;min-width:0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{border:none;background:var(--surface);padding:7px 12px;font-size:.92rem;display:flex;align-items:center;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--surface-2);font-weight:700}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid rgba(0,0,0,.25)}
+.tool{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:7px 12px;font-size:.92rem}
+.tool:hover{border-color:var(--teal)}
+.tool.switch{font-family:var(--display);font-size:1.05rem;background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.stage{background:var(--stage);border:2px solid var(--stage-line);border-radius:18px;overflow:hidden;line-height:0;touch-action:none}
+.stage svg{width:100%;height:auto;display:block;user-select:none}
+.status{border-radius:14px;padding:10px 14px;background:var(--surface-2);font-size:.98rem;min-height:3em}
+.status b{font-family:var(--display);font-weight:400}
+.term{cursor:pointer}
+.term .ring{fill:rgba(21,151,173,.08);stroke:#1597ad;stroke-width:2.5;stroke-dasharray:5 4}
+.term:hover .ring{fill:rgba(21,151,173,.22)}
+.term.sel .ring{fill:rgba(255,197,49,.45);stroke:#e0a400;stroke-dasharray:none;stroke-width:3.5}
+.wire{cursor:pointer}
+.wire:hover .w-main{stroke-width:9}
+.lever{cursor:pointer}
+.handle{cursor:grab}
+.cellgrab{cursor:grab}
+svg.grabbing,svg.grabbing *{cursor:grabbing!important}
+.term .ring{opacity:.55}
+.term.live .ring{opacity:1}
+.term.hot .ring{opacity:1;fill:rgba(31,138,76,.3);stroke:#1f8a4c;stroke-dasharray:none;stroke-width:4}
+.term.hint .ring{opacity:1;stroke:#e0a400;stroke-width:4;fill:rgba(255,197,49,.4);animation:blink .7s ease-in-out infinite}
+@keyframes blink{50%{fill:rgba(255,197,49,.05)}}
+.pulse{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+.tool.switch.pulse{box-shadow:0 0 0 4px var(--glow)}
+.glow{animation:breathe 2.2s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.75}}
+.result{border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;border:2px solid}
+.result.on{background:var(--glow-soft);border-color:var(--glow)}
+.result.off{background:var(--surface-2);border-color:var(--line)}
+.result h3{font-size:1.45rem}
+.result p{margin:0}
+.chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.88rem;font-weight:700}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.safety{display:flex;gap:10px;align-items:flex-start;border:2px dashed var(--bad);border-radius:14px;padding:10px 14px;font-size:.92rem}
+.safety strong{font-family:var(--display);font-weight:400;color:#fff;background:var(--bad);border-radius:8px;padding:0 8px;flex:none}
+
+/* quiz */
+.qblock{display:flex;flex-direction:column;gap:12px}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choice{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 16px;font-size:1rem}
+.choice:hover{border-color:var(--teal)}
+.choice[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft);font-weight:700}
+.choice.right{border-color:var(--ok);background:var(--ok-soft)}
+.choice.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.choice:disabled{cursor:not-allowed;opacity:.5}
+.sentence{font-size:1.06rem;line-height:2.2}
+.blank{display:inline-flex;flex-wrap:wrap;gap:6px;vertical-align:middle;padding:2px 6px;border-bottom:2px dotted var(--muted)}
+.blank .choice{padding:3px 10px;font-size:.95rem}
+.fb{border-radius:12px;padding:10px 14px;font-size:.96rem}
+.fb.ok{background:var(--ok-soft);color:var(--fg);border-left:5px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--fg);border-left:5px solid var(--bad)}
+.ox{font-family:var(--display);font-size:1.4rem;margin-right:6px}
+.ox.o{color:var(--ok)} .ox.x{color:var(--bad)}
+table.cmp{border-collapse:collapse;width:100%;font-size:.98rem}
+table.cmp th,table.cmp td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+table.cmp th{background:var(--surface-2);font-weight:700}
+.tablewrap{overflow-x:auto}
+
+/* materials */
+.mat-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:16px;align-items:start}
+@media (max-width:860px){.mat-layout{grid-template-columns:1fr}}
+.rodpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rodbtn{background:var(--paper);border:2px solid var(--stage-line);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.rodbtn svg{height:56px;width:100%;max-width:84px}
+.rodbtn span{font-family:var(--display);font-size:.95rem;color:#1b2a33}
+.rodbtn[aria-pressed="true"]{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.rodbtn .tested{font-family:var(--body);font-size:.75rem;color:#1f8a4c}
+.rod-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.rod-panels{grid-template-columns:1fr}}
+.rp{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.rp .ph{position:relative;line-height:0;background:var(--paper)}
+.rp .ph img{width:100%;height:auto}
+.rp .label{position:absolute;left:10px;top:10px;line-height:1.2;font-family:var(--display);font-size:1.15rem;padding:5px 12px;border-radius:10px;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.rp .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.rp .body .choices{gap:6px}
+.rp .body .choice{padding:5px 10px;font-size:.92rem}
+.rp .lockmsg{font-size:.82rem;color:var(--muted)}
+
+/* summary */
+textarea{width:100%;min-height:130px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:#1b2a33;font:inherit;padding:12px 14px 12px 42px;resize:vertical;background-image:linear-gradient(transparent 31px,#dfe7eb 32px);background-size:100% 32px;line-height:32px;background-attachment:local}
+.notewrap{position:relative}
+.notewrap svg{position:absolute;left:12px;top:12px;width:20px;height:20px}
+.selfeval{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.selfeval{grid-template-columns:1fr}}
+.se{background:var(--glow-soft);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.se .k{font-size:.78rem;font-weight:700;background:var(--surface);border-radius:999px;padding:1px 9px;align-self:flex-start;color:var(--muted)}
+.faces{display:flex;gap:8px}
+.face{background:var(--surface);border:2px solid transparent;border-radius:12px;padding:4px 6px;display:flex;flex-direction:column;align-items:center;font-size:.75rem;gap:2px}
+.face svg{width:34px;height:34px}
+.face[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft)}
+.scoreboard{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--display);font-size:2.4rem;color:var(--teal-ink);font-variant-numeric:tabular-nums;line-height:1}
+.model{border-left:5px solid var(--teal);background:var(--teal-soft);border-radius:0 12px 12px 0;padding:10px 14px}
+@media (prefers-reduced-motion:reduce){*:not(.spin):not(.wave):not(.glow){animation:none!important;transition:none!important}}
+</style>
+<style>
+.cardtabs.setups button{width:auto;padding:0 16px;font-size:1.1rem}
+.cardtabs .tick{color:var(--ok);font-family:var(--body)}
+.cardtabs.setups button[aria-selected="true"] .tick{color:#fff}
+.q.sub{margin-left:38px;font-size:1rem}
+.tip{font-size:.92rem;line-height:1.55;padding:12px 14px}
+.tip b{font-family:var(--display);font-weight:400;color:var(--teal-ink)}
+.nextbar{background:var(--ok-soft);border-radius:14px;padding:10px 14px}
+.spin{animation:spin linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wave{animation:wave .75s ease-out infinite}
+@keyframes wave{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.cmpgrid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:start}
+.cmpgrid:not(:has(.cmpmid)){grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:700px){.cmpgrid,.cmpgrid:not(:has(.cmpmid)){grid-template-columns:1fr}.cmpmid{display:none}}
+.cmpcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.cmphead{font-family:var(--display);text-align:center;padding:6px 10px;border-radius:12px 12px 0 0;color:#1b2a33}
+.cmphead.one{background:#d6ebf7}.cmphead.two{background:#dcefd2}
+.cmpimg{line-height:0;border-radius:0 0 12px 12px;overflow:hidden;background:var(--paper);margin-top:-8px}
+.cmpimg img{width:100%;height:auto;aspect-ratio:1.42;object-fit:cover;display:block}
+.cmpres{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface-2);border-radius:12px;padding:8px 12px}
+.mini{width:84px;height:auto;flex:none}
+.note{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--muted)}
+.note input{font:inherit;font-size:1rem;color:#1b2a33;background:var(--paper);border:none;border-bottom:2px dotted var(--muted);padding:6px 4px}
+.note input:focus-visible{outline:3px solid var(--glow)}
+.symrow{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.symlabel{font-family:var(--display);font-size:1.05rem}
+.symcircle{width:72px;height:72px;border-radius:50%;border:5px solid #9fd6e4;display:grid;place-items:center;font-family:var(--display);font-size:2.2rem;color:var(--teal-ink);background:var(--surface)}
+.symcircle.right{border-color:var(--ok);color:var(--ok)}.symcircle.wrong{border-color:var(--bad);color:var(--bad)}
+.choice.sym{font-size:1.6rem;font-family:var(--display);width:64px;padding:4px 0}
+#cmpBulb,#cmpMotor,#cmpBuzz{display:flex;flex-direction:column;gap:16px}
+</style>
+<style>
+.toolbar .tool[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.gogobj,.gogoff,.lensin{cursor:pointer}
+.gogIn{animation:gogIn .6s ease-out}
+@keyframes gogIn{from{opacity:0}to{opacity:1}}
+.gogFly{animation:gogFly .65s ease-in forwards;transform-box:fill-box;transform-origin:center}
+@keyframes gogFly{from{transform:scale(.5);opacity:1}to{transform:scale(7);opacity:0}}
+.gogMsg{animation:gogMsg .7s ease-out forwards}
+@keyframes gogMsg{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+.lightsw,.carton,.dropper,.sprayer,.lensloose,.rod{cursor:pointer}
+.laserbody{cursor:ns-resize}.penlaser{cursor:grab}.pwr{cursor:pointer}
+.room{transition:opacity .6s ease}
+.obs{font-size:.95rem;background:var(--surface-2);border-radius:12px;padding:6px 12px}
+.picchoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:600px){.picchoices{grid-template-columns:1fr}}
+.picchoice{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.92rem;text-align:center}
+.picchoice:hover{border-color:var(--teal)}.picchoice[aria-pressed="true"]{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.picchoice.right{border-color:var(--ok);background:var(--ok-soft)}.picchoice.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.picchoice:disabled{opacity:.5;cursor:not-allowed}
+.qmini{width:100%;max-width:200px;height:auto;border-radius:8px}
+.recmini{width:96px;height:auto;display:block;border-radius:6px}
+table.rec td{vertical-align:middle}
+.drop{animation:drop .42s cubic-bezier(.5,0,1,1) forwards}
+@keyframes drop{to{transform:translateY(var(--dy))}}
+.ripple{animation:ripple .8s ease-out forwards;transform-box:fill-box;transform-origin:center}
+@keyframes ripple{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(6,4)}}
+.cloudIn{animation:cloudIn 1.2s ease-out}
+@keyframes cloudIn{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
+.mistp{animation:mist 1.4s ease-out forwards;opacity:.9}
+@keyframes mist{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+.meter{display:flex;align-items:center;gap:10px;flex:1;min-width:200px;font-size:.92rem;color:var(--muted)}
+.meter .bar{flex:1;height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8fc3ea,#ffffff);border-right:2px solid #8fb3cf;transition:width .25s}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;border:2px solid var(--line);border-radius:12px;padding:6px 10px;background:var(--surface)}
+.btn.rec{background:#d8343a}
+.stage{touch-action:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge">탐구<br>활동</div>
+    <div class="top-text">
+      <div class="kicker">4 빛을 렌즈와 물에 비추어 볼까?</div>
+      <h1>렌즈와 물을 이용하여 빛의 굴절 실험하기</h1>
+    </div>
+    <div class="top-meta">
+      <span class="pill">『과학』 50~51쪽</span>
+      <button class="ghost" id="muteBtn" type="button" aria-pressed="false">소리 끄기</button>
+      <button class="ghost" id="resetBtn" type="button">처음부터 다시</button>
+    </div>
+  </header>
+  <div class="panel" id="resetConfirm" hidden style="margin-bottom:16px">
+    <div class="row-end"><span>지금까지 한 실험과 답을 모두 지울까요?</span>
+      <span style="display:flex;gap:8px"><button class="btn alt" id="resetNo" type="button">아니요</button><button class="btn" id="resetYes" type="button" style="background:var(--bad)">모두 지우기</button></span></div>
+  </div>
+  <nav class="steps" id="steps" aria-label="활동 단계"></nav>
+  <main id="scenes">
+  <section class="scene" data-scene="0">
+    <div class="scene-head">
+      <span class="tag">준비물</span>
+      <h2>오늘 쓸 준비물을 하나씩 눌러 보세요</h2>
+      <p class="lead">그림을 누르면 준비물의 이름과 하는 일을 알 수 있어요. 13가지를 모두 알아보면 실험을 시작해요.</p>
+    </div>
+    <div class="supply-layout">
+      <div class="supply-grid" id="supplyGrid"></div>
+      <div class="panel detail" id="supplyDetail" aria-live="polite"></div>
+    </div>
+    <div class="row-end"><span class="progress" id="supplyProgress"></span><button class="btn" type="button" data-go="1">실험 시작하기 →</button></div>
+  </section>
+
+  <section class="scene" data-scene="1" hidden>
+    <div class="scene-head"><span class="tag">실험해요 1 · 레이저 지시기의 빛을 렌즈에 비추기</span><p class="q"><span class="num">1</span><span>볼록 렌즈를 받침대에 끼웁니다.</span></p>
+      <p class="q"><span class="num">2</span><span>교실을 어둡게 하고, 레이저 지시기(확산형)를 렌즈를 향해 켭니다.</span></p>
+      <p class="q"><span class="num">3</span><span>레이저 지시기(확산형)를 좌우로 움직이면서 빛이 렌즈를 통과할 때 나아가는 모습을 관찰해 그림으로 나타내 봅시다.</span></p></div>
+    <div class="lab">
+      <div class="ref"><figure><img src="data:image/jpeg;base64,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" alt="교과서 사진: 볼록 렌즈를 받침대에 끼우는 모습"><figcaption>① 볼록 렌즈를 받침대에 끼웁니다.</figcaption></figure>
+        <figure><img src="data:image/jpeg;base64,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" alt="교과서 사진: 레이저 지시기(확산형)를 렌즈를 향해 켠 모습"><figcaption>② 레이저 지시기(확산형)를 렌즈를 향해 켭니다.</figcaption></figure>
+        <div class="panel tip"><b>실험하는 동안</b><br>레이저 지시기는 빛이 나아가는 방향의 좌우 수평으로 움직입니다.</div>
+        <div class="safety"><strong>안전</strong><span>렌즈가 깨지지 않도록 조심합니다. 볼록 렌즈로 태양을 바라보지 않습니다. 레이저 지시기의 빛을 눈에 비추지 않도록 주의합니다.</span></div>
+      </div>
+      <div class="stagebox">
+        <div class="toolbar"><button class="tool" type="button" data-dark-btn aria-pressed="false">교실 불 끄기</button>
+
+          <button class="tool switch" type="button" id="laser_vx">레이저 켜기</button>
+          <button class="tool" type="button" id="redo_vx">이 실험 처음부터</button>
+        </div>
+        <div class="stage" id="stage_vx"></div>
+        <div class="obs" id="obs_vx"></div>
+        <div class="status" id="status_vx" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="panel qblock">
+      <p class="q"><span class="num">?</span><span>빛이 볼록 렌즈를 통과할 때 나아가는 모습으로 알맞은 그림을 고르고, 문장을 완성해 봅시다.</span></p>
+      <div id="q_vx"></div>
+      <div class="row-end"><span class="hint" id="qlock_vx"></span><button class="btn" type="button" id="qgrade_vx">채점하기</button></div>
+      <div id="qfb_vx"></div>
+    </div>
+    <div class="row-end"><button class="btn alt" type="button" data-go="0">← 준비물</button><button class="btn" type="button" data-go="2">오목 렌즈 →</button></div>
+  </section>
+  <section class="scene" data-scene="2" hidden>
+    <div class="scene-head"><span class="tag">실험해요 1 · 레이저 지시기의 빛을 렌즈에 비추기</span><p class="q"><span class="num">4</span><span>오목 렌즈를 받침대에 끼운 뒤 ②, ③을 반복합니다.</span></p></div>
+    <div class="lab">
+      <div class="ref"><figure><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCABuAMsDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9Trm5jtI98rbV6e5rOPiGLPETkfUVR8QSs98EJ+VFGB9aoZqbiubo8Qxn/li350v9vx/88m/OsJetOpXZN2bo12Mj/VN+dH9uR/8APJvzrDBPrUlFxXZsf25H/wA8m/OlGtof+WTfnWNRmncLs2f7aT/nk350f20n/PJvzrIHSgnjOfyouF2a/wDbSf8APJvzpf7aTH+rb86wbu8jsSv2jdCjDIdlIX/vrpVAeKNLbUodO+3JHezKXiikyvmKOCVJADfgTTbUVdlK7Ot/tlMf6tvzpP7aT/nk351k5GODmildibZrHW0H/LJvzpP7cj/55N+dZDUlFxXZsf25H/zyb86P7cj/AOeTfnWPRRcLs1216Nf+WTfnSf2/H/zyb86xpO1NpXYXZt/8JBH/AM8m/Om/8JDH/wA8W/OsU9KbQmxps228Rxr/AMsW/MUw+J4gf9Q/5isSTtUL/eoux3OtsdYt79tikpJ/dbv9Kv1waSNE4dThlOQfeu6jbfGrdMgGmncaOZ17/kJP9B/KqCfeFX9d/wCQk/0H8qohSDmpe4mSL1p1Rh8Gl38dKLMndkwYbcZpC6oCWYAepqleahHaICfmY9FFY11eS3b7nOFHRR0FfMZrn9DLVyR96fb/ADO/D4OdbV6I6hHWQZBBHsaeoOOK5ATSKwKNtx71ft9buYcByJVHYjFeRhuLsPPSvBxflqjpnl818LudCD+Yrxr9ob9ozT/gJbaSDYrq2o30mRZmXytsK/ecsAe+ABj+9Xqtvr0EhxMuwHsOa/KL9obx5dfHf9ti78M2d0ZLC31FNHgWPskX+tI+reYa+uw2Y4bGRcsPNSOGVGdJ++rH6afDT4jTfGHwrYa8dNk0mynXclvK+5m/2ifT0rzX9qzx1oOk+CtRtWurqDxHpIjv7Uw2Fw6qwwf9aqFRlSR97617J4J0CHwx4bsNNtyPItoVjUemBXn/AO1Rrx0L4I+J5lQSPLbrbqrEAZd1Uk/QE1pUpyq0HGe7RjGoozUl0Kvw1/ae8IeIvAOhalf3l5HqF1aRtcqmkXjr5oGGwyxEHlc8Gukb9oPwMRgahqH/AIJb7/4zVH9lee/vf2d/AN1qSJBc3Nh55SNMBVZnZAB/uFee9erspUZNdUFaKT7Cbvqee+IPidC/w41HxJ4ZUahNFmO1hvYJbYSygj5CJAhGfU4HvXn2mftGa1qa6xPP4di0a1s9Nu5YfPlE0lxdxlfLjVQy5VgJP975cMM8+zeNPDMfjXwrqmhy3ElpFfwNA00QBZQe4B4rzzwN+zV4c8E6lfXaM119ss3sZF+eM+WzKxwwfIOUXBGCMcEVSTu/T9H/AF/WppZev4aGJ8Hfjpqvj/xk2mX17ostmsMqkWunXlrMLhSmEBmJQjaXJHXgYzzWd4p/aJ1rSL/X49Nh03ULW0uHtoZXWOOSF45ZI5BJELtpGAKKA+xASw+XBzXqGifCTQ/DXiS11fTGv4Xghlia3nv57mOQuUwxErthl2kAjH32qHW/hc2sX2rSf25PHZalMlxLYTWdtcQo6xrHlfMjYjIXPXqzHvTb1jbpv9/+Qo2V7nMeIPjJrGmazaW9pZ6TeaaI0fUtTNxKItKLRqV+0lY2CbmPTJ2jDNhea9ZglE8Ecqsjq6hg0bblYEZyD3HvXNN8N9P6nU9dUnqsOsXMSD/dRXCqPYAAdq6OztEsbSG2jeWRIkCBp5Gkcgd2ZiST7k03bUySaSJT0ptONIRipRaI5O1RMCT0qZl3YphGDQxkLdDXdW/+oj/3R/KuFf8Airurf/UR/wC6P5U4lI5vXf8AkJP9B/KqZGeKua9/yEn+g/lWcz4Gc0m7C6j+ADjms291ZIwUiO9uhPpXJ/FjxRqHhnw1HfacybxdIjq65DKVbr+QrzzRfjzbSOE1SxaAnrJA25fyPP6mvzviPPK+Fn9Uw6s7av17Hu4LAqpH2stfI9dJ3ndkknuaNtYGieN9E8RALY6lA74/1Ttsf/vk81V8WeNh4emht7aKO5uX+Zw7HCL+HevzajSq4yryQ1k/61Pb5GtDq1Qk8U9YsjnivOm+K0ltbed9jRsfeAJxS6f8ctEnm8u9JtG4Bbqv416dTJcZTV+W/ozRUKkldK56FdSfY7K4udpcwxNJtHU4BOP0r80P2R/h3YXP7ULeJr97xtSk+3XqxToNnmOT3BPTeetfYPxU/bD+HfwwurbTtV1IXCX/AO5E1uPMRNwwQQDuwM8kdMjvXH/DDwhpvhn4m6Z4oj0UWel3wkiWeNGCyJJjY4JJ4BA/PnPb6HAQq5Xg6teq+Rzso33Z5cuWvJ0+W9j6rt9duY0XdGjDAHTH49a+ZP2xdauPiGNF8F6fKllGsqXt/cSyBY03Hy4gx4AHzu3P90V7V8S/iRoPw28PT6rrl6lhaRghVzl5WwflRerMecCvkDwroHif9oTVNSu54JNL0PUb03U9zKh3pF/BEexKjHA4HeunB5li6dKVfE1P3eyv1fkKjgaWKqqmtFu32X+fZH334PTSdL8L6Vpum3Eb2dlaxWsIVgV2IoUYI46CtzBc4yCvqDmvKfAXhLSPh94eg0XRoClrFgsZGLO7d2J6EmusivJYf9U7L7CtsPxc4u1WF13Wn4f8E5a+XQUn7KTt5nUFAhGDSVgJr80ZAkVZB/3yauw69bTEA7o/qePzr6fDcQYDE6KfK/PQ82eEqw6GgU6nNMp0UyTIWjdXX2pGGB0r6CE41FeDTORprcjk7Vy/jD4iaN4Fns4tXllhN3HNLE0cRcYiClgccg/MMf0rqsZ6ivPfjJ4DufG2laYljaRXFzb3WZWLRpKLdkYOsbSI6glhHnKnIBqpJ203CKV7y2M7WP2hfDWj6RqF+0N/ciye1Etvbwh5Qs8UckbsAfkU+aq5YjLAgZrZn+LWh2uorZXMWpwXEnkCKIadPLLI0scsgXykRnUhYZC25QBiuIvfhTq1x4VMaae0mpjUIpSl9cWkoMAiSFtqC3EG4RoqqXiYgZwRmneFPhFr9vfC7m1CXSJbGeCTT5ZzBdybEt54WRhHHGm0Cc7eMjHcYFW7a27/AIaf5/mStlft+P8AX5o9C8L+P9P8W6tqVhZw3MclgCZGnRVDYuLiA4wSfvWznnHBXvkDon+9Xm/wr+GN54D8TeJL+5FnJ/ao8x7m2UK88hu7yXdINo+bZPEO/QgcAV6Q/wB6l0H1ZA/8Vd1b/wCoj/3R/KuGbqa7mD/UR/7o/lREpGDraA3rknHyj+VZrWgYAZxnvXKePfizaeEPFl/p95ay3DRrG8RjYDAZBkHPuK51v2ibJcFdIlZfVpwP0xXmVMxw1OTjOdmnax7lPI8fWiqlOm2mk09Opc+M2jSN4B1Jwu/yikvByQA3J/Wvkh9WilyI5UbBwQG5H1r6V8S/G611zT5bWPTNiSLtJaf/AOtXl954a0fxZ5hazhNwTjIGGX6MMGvic1wWHzTEKrSqe9a1vQ9zD4PHZfQ/f0tL7nnVoz311FDEcuzYBXtXq+l6W6wKZmMjFQMtyazfDPw1i8O3s10kjzkn5Edt3lj0BrqhNt+Vhtx7UZdl/wBUTcviZu53RBPpUM1q8R3IGBBYH2rxTxp8DPE3iPWALbxTZ2WjswZ/3TicqB90Ecc+te1XF6FwNw56c1i6pf8Aloc9MV7qil7xpTqzSdOLsmeJXH7LvgSx1JdT1xLjxTqq7QXu3KQxgdFjiU4VR6HJ9Sa9r1D42x+Evhr9inSOW9BNrYW+wD92q4BI7BRgD1rjp9TGqXMscbfKmAzjoPauug17SLzR7fS9Q0iFreFdqvsD/UnPPP1r4XP81g37GpFys/uPTw2EoUuVyjfucl8Kvhzqnxkuo7nXZ520WNt+6Xlpj12qT0Hv+VfVFjotnoOl29hZW6W9tCoVI0UAKK5L4ceJNBsbdbW1u4Igo2pERswPpXb3Nwsi5ByD3HSvjauNniopzenRdkcWMquVV8keWPZIhjOGPcVcifIqnER1/pViNgOKyTR5zVyZvn6c00gjjFPVgBn1pGOTW1+xlaxGGZH3qWVh3WrdvrF5CMF/M9nP9arGkIxXVRxmIwz5qM3H0JlCE1aSubUXiCNgBNEyt/eXkVehvoLggJKrH06GuWqKTG7nP+FfUYbizG0FaslNfczgnl9Kfw6HUa3K9vo1/LGSkiW8jKw6ghTg1zfwk1O61r4U+C9Qv53ub680WyuJ55DlpJGgRmY+5JJqnq17cQaHqOydsfZpOG5/hNZnwQ10Q/BrwIksRbGg2A3Kf+nePtX2OE4qwWIhzVrw6a7Hn1MuqQ+HU9JY4xUUnKmq6arbzgbZVVv7sny1YbmIsOQOcjpX1VDE0MTHmpTUl5M8+VOUHaSsQEhetd1B/qI/90fyrhmjLAYIruYP9RH/ALo/lXVElHxr+0qbmy+MOqXSmT7MbODIBG3IUc/WvJbjxZ8h25J9a9P/AGm7yYfGrVbbaGheygHzf9c68EadIpenqK/N8bHmxVS/dn9F5Ol/ZuH/AMMfyOkt/E7BiGPB9a2/DXioQ6xCATiUlCM/571529zt3Pml0bUG/ta1Zf8Anso/WsYQtJNHbiUp0Zxl1TPoVvFBjj2qRu6dKhXXzecZww61wr6nluO/eoW1O4hPyDHPLE19Mkkj8gTcnojsb28jtzvZiSegFcvq2u/2hus7diZn4wOqe/19qyfE2m+M5bCG7TRbyPSpcOL1IywZT9Og+tejfAv4Ns4m1u70+a2gZR5Iucje+clwppcsqj5YnS508NTdWbTt08zh49EvvDUCpc6dNFAP+W6DzF/ErUsGoRXK5idZV7lDnFfRF54daAHnH0rkNc+Hmkay7PcWMQmx/rohsfP1HJ/Gvlsfwt7aTqU6ju+5y0c6u/3i+48s87JGDx65rZ0vxZq2jkfZb6VUH/LN23L+Rq1ffC+9tmLadqAmUf8ALG8T/wBnXn8wawb3StW0jJu9OmWMdZIf3qj8uR+Ir4vFZFjcNvC67rU9OGMoVlZS+89H0j41XUO2PULJJ1AA82JtrfkeK7fSfiXoWrbVF2ttMT9y4+X9elfOsd/FNzG6uvQgHJ/KpwwY4I4rxHGUdGrDlSg9j6thuklTdG6uvYqdw/MVIsmRmvmDTtc1DSGBsryW3wc4Vvl/LpXZaR8ZdTsxtv7eK9Tu6fI/+BoU5HJKg+h7fuzSnkVxGj/FbQtSCrLO9jIe1wMD8+ldZb3kd3GJYJlmiPRlYEH8qftEzBwa3RO5K4ximE7utBfdTSeaJSuhJWEcB1KsoZTwQehFMigjt7eOCGNIYY1CJHGu1VUDAAA6AU+kY/LjOPpWbbtYtIZNIlvE0kjhI1BZmboB6nNcr4H8eyeJ/iJ9htWI0mC3mf8A66sABuPtk8Vz/wAQvEB1wyaVayslqhAmkT/lof7o9qufAjQDZeKLu6aRGjW1MY92JH9Aa9Xh+vz5pRpU3119FuepXwcKWX1a9X4mtPI9rb5V4rtoP9RH/uj+VcbKFPTpXZQf6iP/AHR/Kv6QR+Xo+EP2sJ5ovjtqR3lYFtLbIH/XOvDrm5xufqSxr2L9s+7Sy+Mt8WkIaS2txsXqfkFfPjxXupzBbexu5cng5Y/yFfB4mnzYmo/Nn7/lVdQy6hFv7K/It3F7+6K4wc9K6n4e6HeeJtXhtdNtpLu8VTIY4xk8D/69ctB8PvE2oXINvoWquAMlo43P9DX1P+yV8LdU8PHVtd1rTrizneNba1F2ux2B5cgcHnAGauhh3VqRijnzTMqeGwlSSkr2svVmHbfBTxpJB5x0kOe0bTKpP610Xgv9nnxBqGorL4hMOl2CkFoYn8yRx/d44H1r6G2lADyAcdaiutcjtFKFhx3r6j6rDqfkEcxrWtGyLthbxafDHbxKI4okEaKBwABgAe1TXMisnBBrlpPFUQJAaqU/iQuxw1dNraI8+7lqzV1GFZCcnvXPXmnAv8pzU39rtMcE5qaEGZwaTjcOZoyzoRYZHGary6G6Dpke9d1a26eWMrzUz6Ysh5AxWfskxe0aPG9a8DafqzFruxiaTtKow4/4EOa43UvhTJGxbTdQePv5V0vmD6AjBH619FXegxvyABWNc6ANx2jB9a8rE5VhsQrVIJnXTxlSn8Mj5pv9C1nSCTc6dJIi9ZbT94Prjr+lUrbUo7jIjkDMvVe6/Udq+jLzRHQ5GT+FczrfgjTdWB+2WMcsg+7Jt2uv0Yc18hi+E6ctaEreT1PXpZq1/EX3HkG8P+NXNN1O70uQSWlzLbMP+ebEV0uqfCd4xv03UJIyefJuR5iH8eGH5muYv/Dut6KGa6055Il6yWv7wfl979K+OxWQ43DL4Lry1PWo4yhVfxanb6P8X9Xsdq3cUd9GOMsNr/mOP0rtdJ+Kuh6kVW4eSwlJ6Sj5fzFeDWupQXGQkisy8MucMv1B5FWfMUnGfwr5qVOUHyyVju9nCSufTltfW99F5lvPHOh7xtuH6VyvjnxEdPgawtWP2qZfnZf4F/xNeJ2WoXGnTiS1uJLdwesT7TXYwGfUpVd2ea5mxlm6k+tcGJnUglTp6ylojswWFpyqOdR6R1G2lo08qwpnJ6n0969K8FW62R/dj92OhPc+tYel6SLNNiZLn7z9yfSu28P6f5ERGPvCv2fhTh/+zKft6y/ey38l2/zPnM7zP623Tg/dX4nUxXHmqMnHFegQf6iP/dH8q85hTYor0a3/ANRH/uj+Vfp0T4o878Y6Lp0viiS7l061luSifv5IFZyAMDkjNFpgBVVVQD+4MfyrrfEmhDVI1mjcRzxjGT0Yehrk4YvLJB5IrNwSbdglUnom9C/ECF+Z2I6/eNNkZEYnOT781CbjaOByKzr69KAnBz61WiRKdyPWdUEUZ5xjNeb61rL3M7ANgZrZ8Q6izhl5HJrkGPmSHNSlc2v1ASyF8ljWhaszEGq0UIYiteytQSOaOULluxiJYcda6jTbc7QCKz9NtF46V0lnb4wAaQmy3bRbVWrqrkVBEOx5xVhOlaIyHGMMoBqJ7VNvQE1OOlLSIuZc2lrIDgVlXehq2Rtz711BAPWk2LjGKlxTLUjgrrw5x93ArKuNDKfwZx6816XJapITkCqFzpqtxmodNPc0U2eP654J07WT/p9nHIw+7Jtw4+jDmuN1L4TtGC2m6lJCR0iuR5iH2zkEfrXv91pEbAjisO80RVLFWxXk4nK8LilarBM7qWMrUfgkfPl14V13TnXz9OMyZx5ts/mKfw4I/KvUNA0wWUCbsG4dcOf7ox0Fblzpu3jK4+lWdL00M/JGPSvFw3DOCwuJWIirtbX6HoSzatOm6e19/Mt6Rp7FkLgmuttYQgAwKrWFqqxjocVqxxKo6c19hCCijw6lRyepFjHFehQDEMYPXaP5Vy2h6P8AbZfPkYeUjfd7k/4V1tdCRmf/2Q==" alt="교과서 사진: 볼록 렌즈를 받침대에 끼우는 모습"><figcaption>① 렌즈를 받침대에 끼웁니다. (사진은 볼록 렌즈)</figcaption></figure>
+        <figure><img src="data:image/jpeg;base64,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" alt="교과서 사진: 레이저 지시기(확산형)를 렌즈를 향해 켠 모습"><figcaption>② 레이저 지시기(확산형)를 렌즈를 향해 켭니다.</figcaption></figure>
+        <div class="panel tip"><b>실험하는 동안</b><br>레이저 지시기는 빛이 나아가는 방향의 좌우 수평으로 움직입니다.</div>
+        <div class="safety"><strong>안전</strong><span>렌즈가 깨지지 않도록 조심합니다. 볼록 렌즈로 태양을 바라보지 않습니다. 레이저 지시기의 빛을 눈에 비추지 않도록 주의합니다.</span></div>
+      </div>
+      <div class="stagebox">
+        <div class="toolbar"><button class="tool" type="button" data-dark-btn aria-pressed="false">교실 불 끄기</button>
+
+          <button class="tool switch" type="button" id="laser_cc">레이저 켜기</button>
+          <button class="tool" type="button" id="redo_cc">이 실험 처음부터</button>
+        </div>
+        <div class="stage" id="stage_cc"></div>
+        <div class="obs" id="obs_cc"></div>
+        <div class="status" id="status_cc" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="panel qblock">
+      <p class="q"><span class="num">?</span><span>빛이 오목 렌즈를 통과할 때 나아가는 모습으로 알맞은 그림을 고르고, 문장을 완성해 봅시다.</span></p>
+      <div id="q_cc"></div>
+      <div class="row-end"><span class="hint" id="qlock_cc"></span><button class="btn" type="button" id="qgrade_cc">채점하기</button></div>
+      <div id="qfb_cc"></div>
+    </div>
+    <div class="row-end"><button class="btn alt" type="button" data-go="1">← 볼록 렌즈</button><button class="btn" type="button" data-go="3">실험해요 2 →</button></div>
+  </section>
+  <section class="scene" data-scene="3" hidden>
+    <div class="scene-head"><span class="tag">실험해요 2 · 레이저 지시기의 빛을 물에 비추기</span>
+      <p class="q"><span class="num">1</span><span>물이 든 투명한 플라스틱 통에 스포이트로 우유를 4방울~5방울 떨어뜨린 뒤 유리 막대로 젓습니다.</span></p></div>
+    <div class="lab">
+      <div class="ref"><figure><img src="data:image/jpeg;base64,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" alt="교과서 사진: 우유를 넣은 물을 유리 막대로 젓는 모습"><figcaption>교과서 사진 · 유리 막대로 젓기</figcaption></figure>
+        <div class="panel"><ol class="howto">
+          <li><b>우유갑 위쪽</b>을 눌러 열어요.</li>
+          <li><b>스포이트를 끌어</b> 우유갑 입구에 대고, 스포이트를 <b>톡 눌러</b> 우유를 빨아들여요.</li>
+          <li>스포이트를 통 위로 옮기고 <b>톡 누를 때마다 한 방울씩</b> 떨어져요. 4~5방울을 넣어요.</li>
+          <li><b>유리 막대를 끌어</b> 물속에 넣고 좌우로 저어요.</li></ol></div>
+        <div class="safety"><strong>안전</strong><span>실험에 사용하는 물질은 맛보지 않습니다.</span></div>
+      </div>
+      <div class="stagebox">
+        <div class="toolbar"><div class="meter"><span>진행</span><div class="bar"><i id="milkBar"></i></div></div><button class="tool" type="button" id="milkRedo">처음부터 다시</button></div>
+        <div class="stage" id="stage_milk"></div>
+        <div class="status" id="status_milk" aria-live="polite"></div>
+        <div class="nextbar row-end" id="milkNext" hidden><span><b>우유 물을 만들었어요!</b></span><button class="btn" type="button" data-go="4">레이저 빛을 물에 비추기 →</button></div>
+      </div>
+    </div>
+    <div class="row-end"><button class="btn alt" type="button" data-go="2">← 오목 렌즈</button><button class="btn" type="button" data-go="4">물에 비추기 →</button></div>
+  </section>
+  <section class="scene" data-scene="4" hidden>
+    <div class="scene-head"><span class="tag">실험해요 2 · 레이저 지시기의 빛을 물에 비추기</span>
+      <p class="q"><span class="num">2</span><span>교실을 어둡게 하고, 레이저 지시기의 빛이 공기에서 물로 나아가도록 여러 각도로 비춥니다.</span></p>
+      <p class="q"><span class="num">3</span><span>레이저 지시기 앞쪽에 분무기로 물을 뿌리면서 빛이 나아가는 모습을 관찰해 그림으로 나타내 봅시다.</span></p></div>
+    <div class="lab">
+      <div class="ref"><figure><img src="data:image/jpeg;base64,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" alt="교과서 사진: 레이저 지시기의 빛을 물에 비추고 분무기로 물을 뿌리는 모습"><figcaption>교과서 사진 · 레이저 지시기와 분무기</figcaption></figure>
+        <div class="panel"><ol class="howto">
+          <li>교실 불을 끄고, 책상 위의 <b>레이저 보안경을 눌러 쓴 뒤</b> 레이저 지시기를 켜요.</li>
+          <li><b>레이저 지시기를 끌면</b> 비추는 각도가 바뀌어요. 빛은 늘 수면의 같은 곳을 향해요.</li>
+          <li><b>분무기를 끌어</b> 레이저 지시기 앞쪽으로 옮기고 <b>톡 누르면</b> 물이 뿌려져요.</li>
+          <li>빛의 길이 보이면 <b>‘이 각도 기록하기’</b>를 눌러 여러 각도의 결과를 모아요.</li></ol></div>
+        <div class="safety"><strong>안전</strong><span>레이저 지시기의 빛을 눈에 비추지 않도록 주의합니다. 실험이 끝나면 주변을 깨끗이 정리하고, 폐기물을 올바르게 처리합니다.</span></div>
+      </div>
+      <div class="stagebox">
+        <div class="toolbar"><button class="tool" type="button" data-dark-btn aria-pressed="false">교실 불 끄기</button>
+
+          <button class="tool switch" type="button" id="wlaser">레이저 켜기</button>
+          <button class="tool" type="button" id="sprayBtn">분무기 뿌리기</button>
+          <label class="chk"><input type="checkbox" id="angChk"> 각도 보기</label>
+        </div>
+        <div class="stage" id="stage_water"></div>
+        <div class="status" id="status_water" aria-live="polite"></div>
+        <div class="row-end"><span class="hint" id="recNeed"></span><button class="btn rec" type="button" id="recBtn">이 각도 기록하기</button></div>
+      </div>
+    </div>
+    <div class="panel qblock">
+      <div class="row-end"><h3 style="font-size:1.2rem">여러 각도로 비춘 결과</h3><button class="tool" type="button" id="recClear">기록 지우기</button></div>
+      <p class="hint" style="margin:0">각도는 물의 표면에 수직인 선(점선)과 빛이 이루는 각도예요. ‘각도 보기’를 켜면 실험대에서도 볼 수 있어요.</p>
+      <div class="tablewrap"><table class="cmp rec"><thead><tr><th scope="col">번호</th><th scope="col">빛이 나아간 모습</th><th scope="col">공기에서 비춘 각도</th><th scope="col">물속에서 나아간 각도</th><th scope="col">결과</th></tr></thead><tbody id="recBody"></tbody></table></div>
+    </div>
+    <div class="panel qblock">
+      <p class="q"><span class="num">3</span><span>빛이 공기에서 물로 나아가는 모습으로 알맞은 그림을 고르고, 문장을 완성해 봅시다.</span></p>
+      <div id="q_water"></div>
+      <div class="row-end"><span class="hint" id="qlock_water"></span><button class="btn" type="button" id="qgrade_water">채점하기</button></div>
+      <div id="qfb_water"></div>
+    </div>
+    <div class="row-end"><button class="btn alt" type="button" data-go="3">← 우유 물 만들기</button><button class="btn" type="button" data-go="5">정리·평가 →</button></div>
+  </section>
+  <section class="scene" data-scene="5" hidden>
+    <div class="scene-head"><span class="tag">정리해요</span>
+      <p class="q"><span class="num">●</span><span>렌즈와 물에 비춘 빛을 관찰해 알 수 있는 빛의 성질을 써 봅시다.</span></p></div>
+    <div class="notewrap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="none" stroke="#7b8f99" stroke-width="2" stroke-linejoin="round"/></svg>
+      <textarea id="summary" aria-label="정리해요 답 쓰기" placeholder="빛은 …"></textarea>
+    </div>
+    <div class="row-end"><span class="hint">다 썼으면 예시 답과 비교해 보세요.</span><button class="btn" type="button" id="sumCheck">예시 답과 비교하기</button></div>
+    <div id="sumFb"></div>
+    <div class="panel qblock"><b style="font-family:var(--display);font-weight:400;font-size:1.15rem">낱말 확인</b><div id="termQ"></div><div class="row-end"><span></span><button class="btn" type="button" id="termGrade">채점하기</button></div></div>
+    <div class="scene-head" style="margin-top:8px"><span class="tag" style="background:var(--glow);color:#1b2a33">스스로 평가하기</span></div>
+    <div class="selfeval" id="selfEval"></div>
+    <div class="panel qblock"><h3 style="font-size:1.3rem">나의 탐구 기록</h3><div class="scoreboard" id="scoreBoard"></div></div>
+    <div class="row-end"><button class="btn alt" type="button" data-go="4">← 물에 비추기</button><button class="btn alt" type="button" data-go="0">처음 화면으로</button></div>
+  </section>
+  </main>
+</div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COL={red:{fill:'#d8343a',stroke:'#8f1d21'},black:{fill:'#2a2c30',stroke:'#050607'}};
+/* ================= 준비물 그림 (직접 그린 SVG) ================= */
+let UID=0;
+function art(id){
+  const u='a'+(++UID);
+  const metal=`<linearGradient id="${u}m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".5" stop-color="#aeb7be"/><stop offset="1" stop-color="#7d878e"/></linearGradient>`;
+  const S=(vb,body,defs)=>`<svg viewBox="${vb}" aria-hidden="true"><defs>${metal}${defs||''}</defs>${body}</svg>`;
+  switch(id){
+  case 'card': return S('0 0 140 110',`
+    <rect x="12" y="14" width="116" height="82" rx="6" fill="#fff" stroke="#9fb0ba" stroke-width="2"/>
+    <rect x="18" y="20" width="104" height="70" rx="3" fill="#f3f8fa"/>
+    <rect x="26" y="30" width="34" height="12" rx="3" fill="#2f63d6"/>
+    <path d="M90 34 h18 v10 h-18z" fill="#e7ebee" stroke="#9aa4ab"/><path d="M96 44 l10 -16" stroke="#9aa4ab" stroke-width="3" stroke-linecap="round"/>
+    <rect x="56" y="70" width="30" height="10" rx="2" fill="#e7ebee" stroke="#9aa4ab"/><circle cx="71" cy="66" r="6" fill="#fff6c8" stroke="#c9a227"/>
+    <path d="M26 40 C18 60 30 76 56 75" fill="none" stroke="#d8343a" stroke-width="2.5"/>
+    <path d="M60 36 C75 34 80 36 90 38" fill="none" stroke="#26282b" stroke-width="2.5"/>
+    <path d="M86 75 C112 76 118 60 108 44" fill="none" stroke="#26282b" stroke-width="2.5"/>`);
+  case 'battery': return S('0 0 140 110',`
+    <rect x="62" y="6" width="16" height="8" rx="2" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <rect x="50" y="12" width="40" height="88" rx="7" fill="url(#${u}c)" stroke="#5f6a72" stroke-width="1.5"/>
+    <rect x="50" y="12" width="40" height="34" rx="7" fill="#2b2f36"/>
+    <rect x="50" y="38" width="40" height="8" fill="#2b2f36"/>
+    <text x="70" y="34" text-anchor="middle" font-size="12" font-weight="700" fill="#ffd23f" font-family="sans-serif">1.5V</text>
+    <text x="104" y="22" font-size="18" font-weight="700" fill="#c8373d" font-family="sans-serif">+</text>
+    <text x="104" y="100" font-size="20" font-weight="700" fill="#2c5cc9" font-family="sans-serif">−</text>`,
+    `<linearGradient id="${u}c" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e979e"/><stop offset=".35" stop-color="#f2f4f6"/><stop offset="1" stop-color="#8e979e"/></linearGradient>`);
+  case 'holder': return S('0 0 140 110',`
+    <g transform="rotate(-18 70 55)">
+    <rect x="14" y="36" width="112" height="40" rx="7" fill="#2f63d6" stroke="#173d8f" stroke-width="2"/>
+    <rect x="26" y="44" width="88" height="24" rx="10" fill="#1d47a6"/>
+    <path d="M28 48 q4 8 0 16 M33 48 q4 8 0 16" fill="none" stroke="#c9d0d5" stroke-width="2"/>
+    <rect x="6" y="44" width="10" height="24" rx="2" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <rect x="124" y="44" width="10" height="24" rx="2" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <rect x="18" y="38" width="104" height="5" rx="2" fill="#5f8cf0" opacity=".7"/></g>`);
+  case 'bulb': return S('0 0 140 110',`
+    <circle cx="70" cy="38" r="28" fill="url(#${u}g)" stroke="#9aa6ae" stroke-width="2"/>
+    <path d="M62 64 L64 40 Q70 28 76 40 L78 64" fill="none" stroke="#6f7a82" stroke-width="2"/>
+    <path d="M65 36 q5 -6 10 0" fill="none" stroke="#e08a00" stroke-width="2"/>
+    <ellipse cx="60" cy="26" rx="6" ry="10" fill="#fff" opacity=".8"/>
+    <rect x="56" y="62" width="28" height="26" rx="3" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <path d="M56 68 h28 M56 75 h28 M56 82 h28" stroke="#7b858c" stroke-width="1.6"/>
+    <path d="M62 88 h16 l-4 8 h-8z" fill="#3a3f45"/><circle cx="70" cy="99" r="3" fill="#8e979e"/>`,
+    `<radialGradient id="${u}g" cx=".38" cy=".35"><stop offset="0" stop-color="#fff"/><stop offset=".75" stop-color="#e8eef2"/><stop offset="1" stop-color="#c7d0d6"/></radialGradient>`);
+  case 'bulbholder': return S('0 0 140 110',`
+    <rect x="12" y="52" width="116" height="40" rx="7" fill="#f4f6f8" stroke="#a9b5bd" stroke-width="2"/>
+    <rect x="12" y="84" width="116" height="8" rx="4" fill="#dfe5e9"/>
+    <rect x="22" y="30" width="12" height="40" rx="3" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <rect x="106" y="30" width="12" height="40" rx="3" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <ellipse cx="28" cy="30" rx="6" ry="2.5" fill="#e3e8ec" stroke="#6f7a82"/><ellipse cx="112" cy="30" rx="6" ry="2.5" fill="#e3e8ec" stroke="#6f7a82"/>
+    <path d="M34 62 H58 M82 62 H106" stroke="#9aa4ab" stroke-width="4"/>
+    <rect x="58" y="44" width="24" height="26" rx="4" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <ellipse cx="70" cy="45" rx="9" ry="3.5" fill="#4b525a"/>`);
+  case 'wires': return S('0 0 140 110',`
+    <path d="M30 30 C-4 60 30 104 66 86 C96 70 70 34 46 28" fill="none" stroke="#26282b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M60 22 C30 50 60 100 96 84 C128 68 108 30 82 22" fill="none" stroke="#d8343a" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(30 30) rotate(-130)"><path d="M0 -5 Q10 -7 22 -4 L22 4 Q10 7 0 5Z" fill="#26282b"/><path d="M-6 -3 L2 -4 M-6 3 L2 4" stroke="#8c969e" stroke-width="2"/></g>
+    <g transform="translate(46 28) rotate(-170)"><path d="M0 -5 Q10 -7 22 -4 L22 4 Q10 7 0 5Z" fill="#26282b"/><path d="M-6 -3 L2 -4 M-6 3 L2 4" stroke="#8c969e" stroke-width="2"/></g>
+    <g transform="translate(60 22) rotate(-120)"><path d="M0 -5 Q10 -7 22 -4 L22 4 Q10 7 0 5Z" fill="#d8343a"/><path d="M-6 -3 L2 -4 M-6 3 L2 4" stroke="#8c969e" stroke-width="2"/></g>
+    <g transform="translate(82 22) rotate(-160)"><path d="M0 -5 Q10 -7 22 -4 L22 4 Q10 7 0 5Z" fill="#d8343a"/><path d="M-6 -3 L2 -4 M-6 3 L2 4" stroke="#8c969e" stroke-width="2"/></g>`);
+  case 'switch': return S('0 0 140 110',`
+    <path d="M14 56 L118 44 Q128 44 128 54 L128 84 Q128 92 120 93 L18 100 Q10 100 10 92 L10 64 Q10 57 14 56Z" fill="#f4f6f8" stroke="#a9b5bd" stroke-width="2"/>
+    <path d="M30 74 v-22 q0 -6 6 -6 h6 v28z" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <rect x="94" y="70" width="14" height="14" rx="3" fill="url(#${u}m)" stroke="#6f7a82"/>
+    <path d="M101 77 L112 12" stroke="#aeb7bd" stroke-width="7" stroke-linecap="round"/>
+    <path d="M108 32 L112 12" stroke="#b7b4e8" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="101" cy="77" r="3" fill="#59636a"/>`);
+  case 'plastic': return S('0 0 140 110',rodArt('#f2c94c','#c99a10',`<path d="M30 70 L108 34" stroke="#fff3b0" stroke-width="3" stroke-dasharray="2 5" opacity=".9"/>`));
+  case 'rubber': return S('0 0 140 110',rodArt('#36383d','#111214',`<path d="M32 66 L106 32" stroke="#55585e" stroke-width="2"/>`));
+  case 'metal': return S('0 0 140 110',rodArt(`url(#${u}r)`,'#5e6a73',`<path d="M34 64 L104 32" stroke="#ffffff" stroke-width="3" opacity=".7"/>`),
+    `<linearGradient id="${u}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset=".45" stop-color="#a3adb4"/><stop offset=".55" stop-color="#d7dcdf"/><stop offset="1" stop-color="#76818a"/></linearGradient>`);
+  case 'gloves': return S('0 0 140 110',`${gloveArt(48,58,-14)}${gloveArt(90,56,12)}`);
+  }
+  return '';
+}
+function rodArt(fill,stroke,extra){
+  return `<path d="M14 74 L104 22 L126 36 L36 88 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+   <path d="M36 88 L36 96 L126 44 L126 36 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" opacity=".8"/>
+   <path d="M14 74 L14 82 L36 96 L36 88 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" opacity=".65"/>${extra}`;
+}
+function gloveArt(x,y,a){
+  return `<g transform="translate(${x} ${y}) rotate(${a})" fill="#fbfcfd" stroke="#a7b2ba" stroke-width="1.8" stroke-linejoin="round">
+   <rect x="-17" y="20" width="34" height="26" rx="5"/>
+   <path d="M-17 22 L-20 -6 Q-20 -14 -13 -14 L-12 -26 Q-11 -34 -5 -33 L-4 -38 Q-2 -46 4 -44 L6 -38 Q10 -44 14 -38 L14 -26 Q20 -28 19 -18 L18 22 Z"/>
+   <path d="M-20 0 Q-34 -10 -30 -18 Q-26 -22 -18 -12"/>
+   <path d="M-12 -14 L-10 4 M-3 -32 L-2 2 M6 -38 L6 2 M14 -26 L12 4" fill="none" stroke-width="1.2"/>
+   <path d="M-17 30 H17 M-17 36 H17" fill="none" stroke-width="1" opacity=".6"/></g>`;
+}
+
+/* ================= drawing helpers ================= */
+function rot(d,deg){const r=deg*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return [d[0]*c-d[1]*s,d[0]*s+d[1]*c];}
+function f(n){return Math.round(n*10)/10;}
+function norm(v){const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];}
+function clipSvg(p,d,color){const a=f(Math.atan2(d[1],d[0])*180/Math.PI),k=COL[color];
+  return `<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${a})"><path d="M-3 -3.5 L8 -7 M-3 3.5 L8 7" stroke="#8c969e" stroke-width="2.4" stroke-linecap="round"/><path d="M6 -7.5 Q20 -9 34 -5.5 L34 5.5 Q20 9 6 7.5 Z" fill="${k.fill}" stroke="${k.stroke}" stroke-width="1.4"/><path d="M12 -4 L28 -3" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/></g>`;}
+function wirePath(p,d1,q,d2){
+  const p0=[p.x+d1[0]*34,p.y+d1[1]*34],p3=[q.x+d2[0]*34,q.y+d2[1]*34];
+  const L=Math.hypot(p3[0]-p0[0],p3[1]-p0[1]),k=Math.min(170,40+L*.38);
+  const c1=[p0[0]+d1[0]*k,p0[1]+d1[1]*k],c2=[p3[0]+d2[0]*k,p3[1]+d2[1]*k];
+  return `M${f(p0[0])} ${f(p0[1])} C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${f(p3[0])} ${f(p3[1])}`;}
+/* 장갑 낀 손: (x,y)에서 집게 몸통을 쥐고, 팔은 d 방향으로 뻗음 */
+function hand(x,y,d){
+  const a=f(Math.atan2(d[1],d[0])*180/Math.PI), flip=d[0]<0?-1:1;
+  return `<g transform="translate(${f(x)} ${f(y)}) rotate(${a}) scale(1 ${flip})" fill="#fbfcfd" stroke="#9eabb4" stroke-width="2" stroke-linejoin="round" pointer-events="none">
+    <path d="M52 -26 L96 -30 L104 22 L56 30 Z"/>
+    <path d="M60 -26 L100 -29 M62 26 L102 20" fill="none" stroke-width="1.2" opacity=".6"/>
+    <path d="M-8 -16 Q-12 -26 -2 -28 L30 -30 Q48 -32 58 -22 L64 0 L60 26 Q50 34 30 32 L0 30 Q-12 30 -10 20 Z"/>
+    <path d="M-10 -8 Q-20 -6 -18 2 Q-16 8 -8 6 M-10 6 Q-20 8 -18 16 Q-15 22 -6 20" fill="#fbfcfd"/>
+    <path d="M14 -30 Q4 -44 -12 -40 Q-22 -36 -14 -28 Q-2 -24 10 -22" />
+    <path d="M6 30 L8 14 M18 31 L19 14 M30 32 L30 14" fill="none" stroke-width="1.3"/>
+  </g>`;
+}
+const DEFS=`<defs>
+ <linearGradient id="GCell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2f4f6"/><stop offset=".45" stop-color="#c3cad0"/><stop offset="1" stop-color="#8e979e"/></linearGradient>
+ <linearGradient id="GMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset=".5" stop-color="#aab4bb"/><stop offset="1" stop-color="#7b858c"/></linearGradient>
+ <linearGradient id="GPlate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3e8ec"/></linearGradient>
+ <linearGradient id="GHolder" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f74e6"/><stop offset="1" stop-color="#1f4fb8"/></linearGradient>
+ <radialGradient id="GGlow"><stop offset="0" stop-color="#fff6b0" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd34a" stop-opacity=".55"/><stop offset="1" stop-color="#ffc531" stop-opacity="0"/></radialGradient>
+ <radialGradient id="GBulbOn" cx=".45" cy=".4"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#fff2a0"/><stop offset="1" stop-color="#ffcc33"/></radialGradient>
+ <radialGradient id="GBulbOff" cx=".38" cy=".35"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#e4eaee"/><stop offset="1" stop-color="#c3ccd2"/></radialGradient>
+ <linearGradient id="GRodMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8ecef"/><stop offset=".45" stop-color="#9ea8af"/><stop offset=".55" stop-color="#cfd5d9"/><stop offset="1" stop-color="#78838b"/></linearGradient>
+ <filter id="GShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#33424c" flood-opacity=".22"/></filter>
+</defs>`;
+const pfx=(P,s)=>s.replace(/id="G/g,'id="'+P).replace(/url\(#G/g,'url(#'+P);
+function battery(x,y){
+  return `<g filter="url(#GShadow)"><rect x="${x}" y="${y}" width="220" height="64" rx="10" fill="url(#GHolder)" stroke="#173d8f" stroke-width="2"/>
+  <rect x="${x+8}" y="${y+6}" width="204" height="10" rx="4" fill="#5f8cf0" opacity=".6"/></g>
+  <rect x="${x+30}" y="${y+14}" width="160" height="36" rx="10" fill="url(#GCell)" stroke="#6f7a82"/>
+  <rect x="${x+120}" y="${y+14}" width="70" height="36" rx="6" fill="#2b2f36"/>
+  <text x="${x+155}" y="${y+38}" text-anchor="middle" font-size="15" font-weight="700" fill="#ffd23f" font-family="sans-serif">1.5V</text>
+  <rect x="${x+22}" y="${y+24}" width="10" height="16" rx="3" fill="#c9d0d5" stroke="#7d878e"/>
+  <rect x="${x-8}" y="${y+14}" width="12" height="36" rx="3" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <rect x="${x+216}" y="${y+14}" width="12" height="36" rx="3" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <text x="${x+2}" y="${y-8}" text-anchor="middle" font-size="18" font-weight="700" fill="#c8373d" font-family="sans-serif">(+)</text>
+  <text x="${x+222}" y="${y-8}" text-anchor="middle" font-size="18" font-weight="700" fill="#2c5cc9" font-family="sans-serif">(−)</text>`;
+}
+function bulbHolder(x,y,lit){
+  return `${lit?`<circle class="glow" cx="${x+120}" cy="${y-6}" r="120" fill="url(#GGlow)"/>`:''}
+  <g filter="url(#GShadow)"><rect x="${x}" y="${y}" width="240" height="86" rx="12" fill="url(#GPlate)" stroke="#b7c2c9" stroke-width="2"/></g>
+  <rect x="${x+28}" y="${y-2}" width="20" height="48" rx="5" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <rect x="${x+192}" y="${y-2}" width="20" height="48" rx="5" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <ellipse cx="${x+38}" cy="${y-2}" rx="10" ry="4" fill="#dfe4e8" stroke="#6f7a82"/>
+  <ellipse cx="${x+202}" cy="${y-2}" rx="10" ry="4" fill="#dfe4e8" stroke="#6f7a82"/>
+  <path d="M${x+48} ${y+40} H${x+104} M${x+136} ${y+40} H${x+192}" stroke="#9aa4ab" stroke-width="5"/>
+  <rect x="${x+102}" y="${y+18}" width="36" height="34" rx="5" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <path d="M${x+104} ${y+24} H${x+136} M${x+104} ${y+31} H${x+136} M${x+104} ${y+38} H${x+136}" stroke="#7b858c" stroke-width="1.6"/>
+  <circle cx="${x+120}" cy="${y-6}" r="26" fill="url(#${lit?'GBulbOn':'GBulbOff'})" stroke="${lit?'#e3a800':'#9aa6ae'}" stroke-width="2"/>
+  <path d="M${x+110} ${y+14} L${x+113} ${y-6} Q${x+120} ${y-18} ${x+127} ${y-6} L${x+130} ${y+14}" fill="none" stroke="${lit?'#ff8a00':'#7b858c'}" stroke-width="${lit?3:2}"/>
+  <ellipse cx="${x+111}" cy="${y-16}" rx="6" ry="9" fill="#fff" opacity=".7"/>`;
+}
+function switchPart(x,y,closed,pulse){
+  const px=x+150,py=y+92, ang=closed?-158:-82, len=118,r=ang*Math.PI/180,ex=px+Math.cos(r)*len,ey=py+Math.sin(r)*len;
+  return `<g filter="url(#GShadow)"><path d="M${x+10} ${y+20} L${x+200} ${y+40} Q${x+212} ${y+42} ${x+210} ${y+56} L${x+204} ${y+118} Q${x+202} ${y+130} ${x+190} ${y+128} L${x+8} ${y+110} Q${x-4} ${y+108} ${x-2} ${y+96} L${x+0} ${y+30} Q${x+0} ${y+18} ${x+10} ${y+20} Z" fill="url(#GPlate)" stroke="#b7c2c9" stroke-width="2"/></g>
+  <path d="M${x+6} ${y+52} H${x+44}" stroke="#9aa4ab" stroke-width="6" stroke-linecap="round"/>
+  <path d="M${x+40} ${y+68} L${x+40} ${y+38} Q${x+40} ${y+30} ${x+48} ${y+30} L${x+56} ${y+30} L${x+56} ${y+68} Z" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <path d="M${x+58} ${y+34} L${x+70} ${y+34} L${x+70} ${y+66} L${x+58} ${y+66}" fill="none" stroke="#7b858c" stroke-width="5"/>
+  <path d="M${px} ${py} L${x+188} ${y+112}" stroke="#9aa4ab" stroke-width="6" stroke-linecap="round"/>
+  <rect x="${px-10}" y="${py-10}" width="20" height="22" rx="4" fill="url(#GMetal)" stroke="#6f7a82"/>
+  <g class="lever ${pulse?'pulse':''}" data-lever="1">
+    ${pulse?`<circle cx="${f(px+Math.cos(r)*100)}" cy="${f(py+Math.sin(r)*100)}" r="26" fill="rgba(255,197,49,.35)" stroke="#e0a400" stroke-width="3"/>`:''}
+    <line x1="${px}" y1="${py}" x2="${f(ex)}" y2="${f(ey)}" stroke="transparent" stroke-width="44"/>
+    <line x1="${px}" y1="${py}" x2="${f(ex)}" y2="${f(ey)}" stroke="#aeb7bd" stroke-width="11" stroke-linecap="round"/>
+    <line x1="${px}" y1="${py}" x2="${f(ex)}" y2="${f(ey)}" stroke="#e7ebee" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${f(px+Math.cos(r)*82)}" y1="${f(py+Math.sin(r)*82)}" x2="${f(ex)}" y2="${f(ey)}" stroke="#b7b4e8" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  <circle cx="${px}" cy="${py}" r="5" fill="#59636a"/>
+  <text x="${x+105}" y="${y+152}" text-anchor="middle" font-size="16" font-weight="700" fill="${closed?'#1f8a4c':'#7b858c'}" font-family="sans-serif">${closed?'스위치 닫힘':'스위치 열림'}</text>`;
+}
+
+/* ================= 끌어서 연결하는 실험대 ================= */
+/* opt: el, P(id prefix), vb[w,h], T(terminals), drop(ids), wires(), statics(), canDrop(i,end,t), after(), hands(i,end)->bool, onLever */
+function Stage(opt){
+  const [W,H]=opt.vb;
+  opt.el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="application" aria-label="${opt.label}">${pfx(opt.P,DEFS)}<g class="Ls"></g><g class="Lw"></g><g class="Lt"></g><g class="Lh"></g></svg>`;
+  const svg=opt.el.querySelector('svg'),gs=svg.querySelector('.Ls'),gw=svg.querySelector('.Lw'),gt=svg.querySelector('.Lt'),gh=svg.querySelector('.Lh');
+  let drag=null,sel=null,hot=null,hint=[],hintTimer=null;
+  const endObj=(w,e)=>w[e];
+  const posOf=e=>e.t?opt.T[e.t]:e;
+  function geom(){ // per wire end: pos & dir (with fan-out on shared terminals)
+    const list=opt.wires(),use={},idx={};
+    list.forEach(w=>['a','b'].forEach(k=>{const e=w[k];if(e.t)use[e.t]=(use[e.t]||0)+1;}));
+    return list.map(w=>{const g={};['a','b'].forEach(k=>{const e=w[k];
+      if(e.t){const t=opt.T[e.t],n=use[e.t],i=(idx[e.t]=(idx[e.t]||0)+1)-1;g[k]={x:t.x,y:t.y,d:rot(t.d,(i-(n-1)/2)*24)};}
+      else g[k]={x:e.x,y:e.y,d:e.d};});return g;});
+  }
+  function statics(){gs.innerHTML=pfx(opt.P,opt.statics());}
+  function dyn(){
+    const list=opt.wires(),G=geom();let wires='',clips='',handles='',hands='';
+    list.forEach((w,i)=>{const g=G[i],k=COL[w.c],d=wirePath(g.a,g.a.d,g.b,g.b.d);
+      wires+=`<path d="${d}" fill="none" stroke="${k.fill}" stroke-width="6" stroke-linecap="round"/><path d="${d}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round" transform="translate(-1 -1.5)"/>`;
+      ['a','b'].forEach(e=>{const p=g[e];clips+=clipSvg(p,p.d,w.c);
+        const held=(drag&&drag.i===i&&drag.e===e&&drag.moved);
+        if(held||(opt.hands&&opt.hands(i,e))) hands+=hand(p.x+p.d[0]*26,p.y+p.d[1]*26,p.d);
+        if(!w[e].lock){const isSel=sel&&sel.i===i&&sel.e===e;
+          handles+=`<g class="handle" data-end="${i}:${e}" tabindex="0" role="button" aria-label="${w.c==='red'?'빨간':'검은'} 전선 집게 집기">${isSel?`<circle cx="${f(p.x+p.d[0]*20)}" cy="${f(p.y+p.d[1]*20)}" r="24" fill="rgba(255,197,49,.35)" stroke="#e0a400" stroke-width="3"/>`:''}<circle cx="${f(p.x+p.d[0]*18)}" cy="${f(p.y+p.d[1]*18)}" r="24" fill="transparent"/></g>`;}
+      });
+    });
+    gw.innerHTML=wires+clips;
+    gt.innerHTML=opt.drop().map(id=>{const t=opt.T[id];const cls=['term',hot===id?'hot':'',hint.includes(id)?'hint':'',(sel||drag)?'live':''].join(' ');
+      return `<g class="${cls}" data-term="${id}" tabindex="0" role="button" aria-label="${t.name}"><circle class="ring" cx="${t.x}" cy="${t.y}" r="20"/></g>`;}).join('')+handles;
+    gh.innerHTML=hands;
+    svg.classList.toggle('grabbing',!!(drag&&drag.moved));
+  }
+  function pt(ev){const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return {x:q.x,y:q.y};}
+  function nearest(p){let best=null,bd=46;opt.drop().forEach(id=>{const t=opt.T[id],dd=Math.hypot(t.x-p.x,t.y-p.y);if(dd<bd){bd=dd;best=id;}});return best;}
+  function other(i,e){const w=opt.wires()[i];return posOf(w[e==='a'?'b':'a']);}
+  function attach(i,e,t){
+    const w=opt.wires()[i];const msg=opt.canDrop(i,e,t);
+    if(msg){opt.say(msg);return false;}
+    w[e]={t};return true;
+  }
+  svg.addEventListener('pointerdown',ev=>{
+    const h=ev.target.closest('[data-end]');
+    if(h){const [i,e]=h.dataset.end.split(':');drag={i:+i,e,start:pt(ev),moved:false,orig:JSON.parse(JSON.stringify(opt.wires()[+i][e]))};
+      try{svg.setPointerCapture(ev.pointerId);}catch(_){} ev.preventDefault();return;}
+  });
+  svg.addEventListener('pointermove',ev=>{
+    if(!drag)return;const p=pt(ev);
+    if(!drag.moved&&Math.hypot(p.x-drag.start.x,p.y-drag.start.y)<6)return;
+    if(!drag.moved){drag.moved=true;sel=null;}
+    const x=Math.max(16,Math.min(W-16,p.x)),y=Math.max(16,Math.min(H-16,p.y)),o=other(drag.i,drag.e);
+    const v=norm([o.x-x,o.y-y]);const d=norm([v[0],v[1]+0.35]);
+    opt.wires()[drag.i][drag.e]={x,y,d};hot=nearest({x,y});dyn();
+  });
+  function endDrag(ev,cancel){
+    if(!drag)return;const dr=drag;drag=null;let changed=false;
+    if(!dr.moved){ // 톡 누르기: 집게 고르기 / 고른 집게를 이 자리에 물리기
+      const w=opt.wires()[dr.i][dr.e];
+      if(sel&&!(sel.i===dr.i&&sel.e===dr.e)&&w.t){const s=sel;sel=null;changed=attach(s.i,s.e,w.t);}
+      else{sel=(sel&&sel.i===dr.i&&sel.e===dr.e)?null:{i:dr.i,e:dr.e};if(sel)opt.say('집게를 골랐어요. 연결할 곳(점선 동그라미)을 눌러 보세요.');}
+    } else if(cancel){opt.wires()[dr.i][dr.e]=dr.orig;}
+    else if(hot){if(attach(dr.i,dr.e,hot))changed=true;else opt.wires()[dr.i][dr.e]=dr.orig;}
+    else changed=true;
+    hot=null;dyn();if(changed)opt.after();
+  }
+  svg.addEventListener('pointerup',ev=>endDrag(ev,false));
+  svg.addEventListener('pointercancel',ev=>endDrag(ev,true));
+  svg.addEventListener('click',ev=>{
+    const t=ev.target.closest('[data-term]');
+    if(t&&sel){const s=sel;sel=null;const ok=attach(s.i,s.e,t.dataset.term);dyn();if(ok)opt.after();return;}
+    if(t&&!sel){opt.say('먼저 전선의 집게를 끌어서 이곳에 놓아 보세요.');return;}
+    if(ev.target.closest('[data-lever]')&&opt.onLever)opt.onLever();
+  });
+  svg.addEventListener('keydown',ev=>{
+    if(ev.key!=='Enter'&&ev.key!==' ')return;const h=ev.target.closest('[data-end]'),t=ev.target.closest('[data-term]');
+    if(h){ev.preventDefault();const [i,e]=h.dataset.end.split(':');sel={i:+i,e};opt.say('집게를 골랐어요. 연결할 곳을 고르세요.');dyn();}
+    else if(t&&sel){ev.preventDefault();const s=sel;sel=null;const ok=attach(s.i,s.e,t.dataset.term);dyn();if(ok)opt.after();}
+  });
+  return {
+    redraw(){statics();dyn();},
+    statics,dyn,
+    hint(ids){hint=ids;dyn();clearTimeout(hintTimer);hintTimer=setTimeout(()=>{hint=[];dyn();},3200);},
+    clearSel(){sel=null;}
+  };
+}
+
+/* ================= 준비물 그림 ================= */
+function art4(id){
+  const u='r'+(++UID),W=(b,d)=>`<svg viewBox="0 0 140 110" aria-hidden="true"><defs>${d||''}</defs>${b}</svg>`;
+  const glass=`<radialGradient id="${u}g" cx=".35" cy=".3"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#d6ecfb"/><stop offset="1" stop-color="#a9cde6"/></radialGradient>`;
+  switch(id){
+  case 'convex': return W(`<path d="M86 74 L120 104" stroke="#1d1f23" stroke-width="10" stroke-linecap="round"/><circle cx="64" cy="50" r="38" fill="#1d1f23"/><circle cx="64" cy="50" r="33" fill="url(#${u}g)"/><path d="M44 36 Q52 24 66 22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M14 96 Q22 76 30 96 Q22 116 14 96Z" fill="#9fc6e3" stroke="#6f9cbd"/>`,glass);
+  case 'concave': return W(`<path d="M86 74 L120 104" stroke="#1d1f23" stroke-width="10" stroke-linecap="round"/><circle cx="64" cy="50" r="38" fill="#1d1f23"/><circle cx="64" cy="50" r="33" fill="url(#${u}g)"/><circle cx="64" cy="50" r="18" fill="none" stroke="#9fc6e3" stroke-width="2"/>
+    <path d="M12 80 H32 Q24 96 32 112 H12 Q20 96 12 80Z" fill="#9fc6e3" stroke="#6f9cbd"/>`,glass);
+  case 'stand': return W(`<path d="M10 62 L96 30 L132 44 L46 78 Z" fill="#f7d35a" stroke="#c99a10" stroke-width="1.5"/><path d="M10 62 L46 78 L46 96 L10 80 Z" fill="#e6b52c" stroke="#c99a10" stroke-width="1.5"/><path d="M46 78 L132 44 L132 62 L46 96 Z" fill="#f0c43c" stroke="#c99a10" stroke-width="1.5"/><path d="M62 52 L86 43" stroke="#b8860b" stroke-width="3"/>`);
+  case 'dlaser': return W(`<rect x="22" y="40" width="80" height="34" rx="5" fill="#1d1f23"/><rect x="100" y="44" width="16" height="26" rx="3" fill="#6f7a82"/><circle cx="54" cy="57" r="6" fill="#d8343a"/><path d="M116 57 L136 44 M116 57 L136 70" stroke="#ff4a4a" stroke-width="2" opacity=".8"/>`);
+  case 'goggles': return W(`<path d="M16 46 Q16 32 40 32 H100 Q124 32 124 46 V62 Q124 78 104 78 Q86 78 80 64 Q70 56 60 64 Q54 78 36 78 Q16 78 16 62Z" fill="#d8343a" opacity=".85" stroke="#8f1d21" stroke-width="2.5"/><path d="M28 44 Q40 38 52 44" stroke="#fff" stroke-width="3" opacity=".7" fill="none"/><path d="M16 50 H6 M124 50 H134" stroke="#2b2f36" stroke-width="5"/>`);
+  case 'tank': return W(`<path d="M18 30 H122 L116 96 H24 Z" fill="rgba(200,230,250,.35)" stroke="#8fb3cf" stroke-width="2.5"/><path d="M21 52 H119 L116 96 H24Z" fill="#8cc7ec" opacity=".55"/><path d="M26 58 H112" stroke="#fff" stroke-width="2" opacity=".7"/>`);
+  case 'milk': return W(`<path d="M44 34 L70 12 L96 34 V100 H44 Z" fill="#fff" stroke="#9aa6ae" stroke-width="2"/><path d="M44 34 H96" stroke="#9aa6ae" stroke-width="2"/><rect x="44" y="52" width="52" height="30" fill="#4f8fd6"/><text x="70" y="73" text-anchor="middle" font-size="15" font-weight="700" fill="#fff" font-family="sans-serif">우유</text><path d="M58 12 H82" stroke="#9aa6ae" stroke-width="4"/>`);
+  case 'dropper': return W(`<rect x="64" y="12" width="14" height="30" rx="7" fill="#e8603c"/><rect x="66" y="40" width="10" height="50" rx="3" fill="rgba(220,240,255,.8)" stroke="#8fb3cf" stroke-width="1.5"/><path d="M66 88 L70 104 L72 104 L76 88Z" fill="rgba(220,240,255,.9)" stroke="#8fb3cf"/>`);
+  case 'rod': return W(`<path d="M30 98 L112 14" stroke="#cfe6f4" stroke-width="8" stroke-linecap="round"/><path d="M30 98 L112 14" stroke="#8fb3cf" stroke-width="1.5" stroke-linecap="round" opacity=".8"/><path d="M36 88 L104 20" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`);
+  case 'pointer': return W(`<g transform="rotate(-30 70 55)"><rect x="18" y="49" width="96" height="12" rx="6" fill="#2b2f36"/><rect x="104" y="50" width="14" height="10" rx="3" fill="#9aa4ab"/><rect x="58" y="47" width="10" height="4" rx="2" fill="#d8343a"/></g><path d="M118 28 L134 18" stroke="#ff4a4a" stroke-width="2.5"/>`);
+  case 'spray': return W(`<path d="M58 46 H92 Q102 46 104 58 V96 Q104 104 96 104 H54 Q46 104 46 96 V58 Q48 46 58 46Z" fill="#2f7ed8" opacity=".85" stroke="#1f5fa8" stroke-width="2"/><rect x="62" y="28" width="26" height="18" fill="#e9eef2" stroke="#9aa6ae"/><path d="M62 30 H40 V38 H62" fill="#e9eef2" stroke="#9aa6ae"/><path d="M76 46 L72 64 L90 60" fill="#e9eef2" stroke="#9aa6ae"/><path d="M34 32 L18 24 M34 34 L16 34 M34 36 L18 44" stroke="#8fc3ea" stroke-width="2" stroke-dasharray="2 3"/>`);
+  case 'coat': return W(`<path d="M50 14 L70 26 L90 14 L120 30 L112 58 L100 52 V102 H40 V52 L28 58 L20 30 Z" fill="#dce9f5" stroke="#8fb3cf" stroke-width="2"/><path d="M70 26 V102" stroke="#8fb3cf" stroke-width="1.5"/><circle cx="76" cy="50" r="2.5" fill="#6f9cbd"/><circle cx="76" cy="70" r="2.5" fill="#6f9cbd"/>`);
+  case 'gloves': return art('gloves');
+  }
+  return '';
+}
+const SUPPLIES=[
+ {id:'convex',name:'볼록 렌즈',desc:'가운데 부분이 가장자리보다 두꺼운 렌즈예요.',use:'받침대에 끼우고 레이저 지시기의 빛을 비춰요.'},
+ {id:'concave',name:'오목 렌즈',desc:'가운데 부분이 가장자리보다 얇은 렌즈예요.',use:'볼록 렌즈와 빛이 나아가는 모습을 비교해요.'},
+ {id:'stand',name:'받침대',desc:'렌즈를 세워 끼울 수 있는 홈이 있는 받침대예요.',use:'받침대 위로 지나가는 빛의 길을 볼 수 있어요.'},
+ {id:'dlaser',name:'레이저 지시기 (확산형)',desc:'빛이 부채꼴로 퍼져 나와 받침대 위에 빛의 길이 선으로 보여요.',use:'렌즈를 향해 켜고 좌우로 움직여요.'},
+ {id:'goggles',name:'레이저 보안경',desc:'레이저 빛으로부터 눈을 보호하는 안경이에요.',use:'레이저 지시기를 켜기 전에 꼭 써요.'},
+ {id:'tank',name:'물이 든 투명한 플라스틱 통',desc:'빛이 물속에서 나아가는 모습을 관찰하는 통이에요.',use:'우유를 몇 방울 넣으면 물속 빛의 길이 잘 보여요.'},
+ {id:'milk',name:'우유',desc:'물에 조금 넣으면 물이 살짝 뿌옇게 돼요.',use:'뿌연 물속에서는 빛이 지나가는 길이 잘 보여요.'},
+ {id:'dropper',name:'스포이트',desc:'액체를 조금씩 빨아들이고 떨어뜨리는 도구예요.',use:'고무 부분을 눌렀다 놓으면 빨아들이고, 다시 누르면 떨어져요.'},
+ {id:'rod',name:'유리 막대',desc:'액체를 저을 때 쓰는 유리 막대예요.',use:'우유를 넣은 뒤 물을 골고루 저어요.'},
+ {id:'pointer',name:'레이저 지시기',desc:'가늘고 곧은 빛을 내는 도구예요.',use:'빛이 공기에서 물로 나아가도록 여러 각도로 비춰요.'},
+ {id:'spray',name:'물이 든 분무기',desc:'물을 아주 작은 물방울로 뿌리는 도구예요.',use:'공기 중에 물방울이 있으면 공기 속 빛의 길도 보여요.'},
+ {id:'coat',name:'실험복',desc:'실험할 때 옷을 보호해 주는 옷이에요.',use:'실험 전에 입어요.'},
+ {id:'gloves',name:'실험용 장갑',desc:'실험할 때 손을 보호해 주는 장갑이에요.',use:'실험 전에 껴요.'}
+];
+const STEPS=['준비물','볼록 렌즈','오목 렌즈','우유 물 만들기','물에 비추기','정리·평가'];
+
+/* ================= state ================= */
+const KEY='refraction-lab-v1';
+function lensDefaults(){return {inSlot:false,lp:null,y:200,on:false,traces:[],obs:{}};}
+function fresh(){return {step:0,seen:{},active:null,dark:false,goggles:false,lens:{vx:lensDefaults(),cc:lensDefaults()},
+  qa:{},qg:{},milk:{open:false,fill:0,drops:0,blobs:[],stir:0,dp:null,rp:null},wl:{on:false,th:35,recs:[],sp:null},summary:'',sumShown:false,self:{}};}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);S=Object.assign(fresh(),o);S.lens=Object.assign(fresh().lens,o.lens);S.milk=Object.assign(fresh().milk,o.milk);S.wl=Object.assign(fresh().wl,o.wl);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function svgPt(svg,ev){const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return {x:q.x,y:q.y};}
+const D2R=Math.PI/180;
+
+/* ================= sound ================= */
+let AC=null,muted=false,noiseBuf=null;
+function ac(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C();}if(AC&&AC.state==='suspended')AC.resume();}catch(e){}return AC;}
+function burst(dur,freq,q,g){if(muted||!AC)return;try{if(!noiseBuf){noiseBuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+  const s=AC.createBufferSource();s.buffer=noiseBuf;const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=freq;bp.Q.value=q;const gn=AC.createGain(),t=AC.currentTime;
+  gn.gain.setValueAtTime(0.0001,t);gn.gain.exponentialRampToValueAtTime(g,t+0.02);gn.gain.exponentialRampToValueAtTime(0.0001,t+dur);s.connect(bp);bp.connect(gn);gn.connect(AC.destination);s.start(t);s.stop(t+dur+0.05);}catch(e){}}
+function tone(freq,dur,g,type,slide){if(muted||!AC)return;try{const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;o.type=type||'triangle';o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  gn.gain.setValueAtTime(g,t);gn.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(gn);gn.connect(AC.destination);o.start(t);o.stop(t+dur+0.02);}catch(e){}}
+const sClick=()=>{tone(300,0.05,0.08,'square');burst(0.03,3000,1,0.05);}, sPlip=()=>tone(900,0.12,0.09,'sine',380), sSpray=()=>burst(0.35,4200,0.6,0.16), sSuck=()=>tone(300,0.2,0.06,'sine',700);
+$('muteBtn').addEventListener('click',()=>{muted=!muted;$('muteBtn').setAttribute('aria-pressed',muted);$('muteBtn').textContent=muted?'소리 켜기':'소리 끄기';});
+
+/* ================= steps ================= */
+const lensDone=k=>['top','mid','bot'].every(c=>S.lens[k].obs[c]);
+const milkDone=()=>S.milk.drops>=4&&S.milk.stir>=1;
+function stepDone(i){
+  if(i===0)return SUPPLIES.every(s=>S.seen[s.id]);
+  if(i===1)return !!S.qg.vx; if(i===2)return !!S.qg.cc; if(i===3)return milkDone(); if(i===4)return !!S.qg.water;
+  if(i===5)return Object.keys(S.self).length===3;
+}
+function renderSteps(){$('steps').innerHTML=STEPS.map((t,i)=>`<button type="button" data-go="${i}" ${S.step===i?'aria-current="step"':''} class="${stepDone(i)?'done':''}"><span class="n">${stepDone(i)?'✓':i+1}</span><span class="t">${t}</span></button>`).join('');}
+function go(i){S.step=i;save();document.querySelectorAll('[data-scene]').forEach(s=>s.hidden=(+s.dataset.scene!==i));renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(+g.dataset.go);});
+
+/* ================= 0 supplies ================= */
+function renderSupplies(){
+  $('supplyGrid').innerHTML=SUPPLIES.map(s=>`<button type="button" class="supply ${S.seen[s.id]?'seen':''} ${S.active===s.id?'active':''}" data-sup="${s.id}" aria-label="${S.seen[s.id]?esc(s.name):'이름 알아보기'}">${art4(s.id)}<span class="nm">${S.seen[s.id]?esc(s.name):'?'}</span></button>`).join('');
+  const a=SUPPLIES.find(s=>s.id===S.active);
+  $('supplyDetail').innerHTML=a?`<div class="big pop">${art4(a.id)}</div><h3 class="pop">${esc(a.name)}</h3><p>${esc(a.desc)}</p><p class="use">${esc(a.use)}</p>`
+   :`<div class="big" style="opacity:.35">${art4('convex')}</div><h3 style="color:var(--muted)">이건 무엇일까요?</h3><p class="use">준비물 그림을 하나 눌러 보세요.</p>`;
+  const n=SUPPLIES.filter(s=>S.seen[s.id]).length;
+  $('supplyProgress').textContent=n===SUPPLIES.length?`준비물 ${SUPPLIES.length}가지를 모두 알아봤어요!`:`${SUPPLIES.length}가지 중 ${n}가지를 알아봤어요`;
+}
+$('supplyGrid').addEventListener('click',e=>{const b=e.target.closest('[data-sup]');if(!b)return;S.seen[b.dataset.sup]=true;S.active=b.dataset.sup;save();renderSupplies();renderSteps();});
+
+/* ================= 공통: 불 · 보안경 ================= */
+const BEAMDEF=`<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+ <radialGradient id="dotg"><stop offset="0" stop-color="#fff" /><stop offset=".3" stop-color="#ff5a5a"/><stop offset="1" stop-color="#ff2020" stop-opacity="0"/></radialGradient>
+ <radialGradient id="puff"><stop offset="0" stop-color="#e8f5ff" stop-opacity=".9"/><stop offset=".55" stop-color="#d4ecff" stop-opacity=".45"/><stop offset="1" stop-color="#d4ecff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="cloudg"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".6" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+ <linearGradient id="glassg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bfe0f5" stop-opacity=".75"/><stop offset=".5" stop-color="#f4fbff" stop-opacity=".55"/><stop offset="1" stop-color="#bfe0f5" stop-opacity=".75"/></linearGradient></defs>`;
+function switchSvg(x,y){const d=S.dark;return `<g class="lightsw" data-light="1" role="button" tabindex="0" aria-label="교실 불 ${d?'켜기':'끄기'}">
+  <rect x="${x}" y="${y}" width="46" height="62" rx="7" fill="#f4f6f8" stroke="#9aa6ae" stroke-width="2"/>
+  <rect x="${x+13}" y="${y+12}" width="20" height="30" rx="4" fill="#dfe4e8" stroke="#9aa6ae"/>
+  <rect x="${x+15}" y="${d?y+27:y+14}" width="16" height="13" rx="3" fill="${d?'#59636a':'#ffd23f'}"/>
+  <text x="${x+23}" y="${y+56}" text-anchor="middle" font-size="10" font-weight="700" fill="#2b2f36" font-family="sans-serif">교실 불</text></g>`;}
+const uniq=(P,h)=>h.replace(/(id="|url\(#)(glow|dotg|cloudg|glassg|puff)\b/g,'$1'+P+'$2');
+function beamLine(pts,alpha,w){if(!pts||pts.length<2||alpha<=0.01)return '';const d='M'+pts.map(p=>`${f(p[0])} ${f(p[1])}`).join(' L');
+  return `<path d="${d}" fill="none" stroke="#ff2a2a" stroke-width="${(w||2.6)*3.4}" opacity="${f(alpha*0.45)}" filter="url(#glow)" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#ff6b6b" stroke-width="${w||2.6}" opacity="${f(alpha)}" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff3f3" stroke-width="${f((w||2.6)*0.35)}" opacity="${f(alpha*0.9)}" stroke-linejoin="round"/>`;}
+function toggleDark(){ac();S.dark=!S.dark;sClick();save();renderEnv();}
+let gogT=0;
+function wearGoggles(v){ac();S.goggles=v;if(v){gogT=performance.now();burst(0.1,1400,1,0.12);setTimeout(()=>tone(880,0.12,0.06,'sine'),120);}else tone(420,0.08,0.05);save();renderEnv();
+  setTimeout(()=>{if(performance.now()-gogT>=700){['vx','cc'].forEach(lensRender);wRender();}},760);}
+function gogArt(sc){return `<g transform="scale(${sc})"><path d="M-62 -6 H-80 M62 -6 H80" stroke="#2b2f36" stroke-width="7" stroke-linecap="round"/>
+  <path d="M-58 -14 Q-58 -26 -36 -26 H36 Q58 -26 58 -14 V6 Q58 22 38 22 Q22 22 16 10 Q8 2 0 2 Q-8 2 -16 10 Q-22 22 -38 22 Q-58 22 -58 6Z" fill="#d8343a" opacity=".85" stroke="#7a1018" stroke-width="3"/>
+  <path d="M-46 -14 Q-36 -20 -24 -15" stroke="#fff" stroke-width="3" opacity=".75" fill="none" stroke-linecap="round"/><path d="M18 -14 Q28 -20 40 -15" stroke="#fff" stroke-width="3" opacity=".6" fill="none" stroke-linecap="round"/></g>`;}
+function gogObj(x,y,lightText){
+  if(S.goggles) return '';
+  return `<g class="gogobj" data-gog="1" role="button" tabindex="0" aria-label="레이저 보안경 (눌러서 쓰기)" transform="translate(${x} ${y})">
+   <rect x="-90" y="-34" width="180" height="78" fill="transparent"/>
+   <circle class="pulse" r="58" fill="none" stroke="#e0a400" stroke-width="3"/>${gogArt(1)}
+   <text y="40" text-anchor="middle" font-size="12" font-weight="700" fill="${lightText?'#ffd6d6':'#7a1018'}" font-family="sans-serif">레이저 보안경 · 눌러서 쓰기</text></g>`;}
+function gogOverlay(w,h,P){
+  if(!S.goggles) return '';
+  const just=performance.now()-gogT<700,rx=w*0.275,ry=h*0.53,cy=h*0.52,c1=w*0.255,c2=w*0.745;
+  return `<g pointer-events="none" class="${just?'gogIn':''}">
+   <defs><mask id="${P}gm"><rect width="${w}" height="${h}" fill="#fff"/><ellipse cx="${c1}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#000"/><ellipse cx="${c2}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#000"/></mask></defs>
+   <rect width="${w}" height="${h}" fill="#4a0b12" opacity=".6" mask="url(#${P}gm)"/>
+   <ellipse cx="${c1}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ff2a2a" opacity=".07"/><ellipse cx="${c2}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ff2a2a" opacity=".07"/>
+   <ellipse cx="${c1}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#b0202a" stroke-width="7" opacity=".75"/><ellipse cx="${c2}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#b0202a" stroke-width="7" opacity=".75"/>
+   <path d="M${f(c1-rx*0.55)} ${f(cy-ry*0.62)} q${f(rx*0.25)} ${f(-ry*0.18)} ${f(rx*0.55)} ${f(-ry*0.2)}" stroke="#fff" stroke-width="7" opacity=".16" fill="none" stroke-linecap="round"/>
+   <path d="M${f(c2-rx*0.55)} ${f(cy-ry*0.62)} q${f(rx*0.25)} ${f(-ry*0.18)} ${f(rx*0.55)} ${f(-ry*0.2)}" stroke="#fff" stroke-width="7" opacity=".16" fill="none" stroke-linecap="round"/>
+  </g>
+  ${just?`<g pointer-events="none" transform="translate(${w/2} ${h/2})"><g class="gogFly">${gogArt(1)}</g></g><text class="gogMsg" x="${w/2}" y="${h/2+8}" text-anchor="middle" font-size="26" font-weight="700" fill="#fff" stroke="#7a1018" stroke-width="5" paint-order="stroke" font-family="sans-serif" pointer-events="none">레이저 보안경을 썼어요!</text>`:''}
+  <g class="gogoff" data-gogoff="1" role="button" tabindex="0" aria-label="보안경 벗기"><rect x="${w/2-56}" y="6" width="112" height="28" rx="14" fill="#7a1018" opacity=".9"/><text x="${w/2}" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">보안경 벗기</text></g>`;}
+function renderEnv(){
+  document.querySelectorAll('[data-dark-btn]').forEach(b=>{b.textContent=S.dark?'교실 불 켜기':'교실 불 끄기';b.setAttribute('aria-pressed',S.dark);});
+  document.querySelectorAll('[data-gog-btn]').forEach(b=>{b.textContent=S.goggles?'보안경 벗기':'레이저 보안경 쓰기';b.setAttribute('aria-pressed',S.goggles);});
+  document.querySelectorAll('.gogbadge').forEach(b=>b.hidden=!S.goggles);
+  ['vx','cc'].forEach(lensRender);wRender();
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-dark-btn]'))toggleDark();});
+
+/* ================= 실험해요 1 · 렌즈 ================= */
+const LZ={xc:440,yc:220,H:110,f:150,LX:178,ymin:92,ymax:348,slot:{x:440,y:220},rest:{x:660,y:332}};
+function lensT(k,h){const u=Math.min(1,Math.abs(h)/LZ.H);return k==='vx'?6+26*(1-u*u):6+24*u*u;}
+function lensOutline(k){const L=[],R=[];for(let i=0;i<=24;i++){const h=-LZ.H+i*(2*LZ.H/24),t=lensT(k,h);L.push(`${f(LZ.xc-t/2)} ${f(LZ.yc+h)}`);R.unshift(`${f(LZ.xc+t/2)} ${f(LZ.yc+h)}`);}return 'M'+L.join(' L')+' L'+R.join(' L')+'Z';}
+function tracePts(k,y){
+  const h=y-LZ.yc,pts=[[LZ.LX,y]];
+  if(Math.abs(h)>LZ.H-3||!S.lens[k].inSlot){pts.push([790,y]);return pts;}
+  const t=lensT(k,h),x1=LZ.xc-t/2,x2=LZ.xc+t/2,fs=k==='vx'?LZ.f:-LZ.f,sl=-h/fs,y2=y+sl*0.5*(x2-x1);
+  pts.push([x1,y],[x2,y2]);let x=790,yy=y2+sl*(790-x2);
+  if(yy<18){x=x2+(18-y2)/sl;yy=18;}if(yy>422){x=x2+(422-y2)/sl;yy=422;}
+  pts.push([x,yy]);return pts;
+}
+function catOf(y){const h=y-LZ.yc;if(Math.abs(h)<=14)return 'mid';if(h<-30&&h>-LZ.H+4)return 'top';if(h>30&&h<LZ.H-4)return 'bot';return null;}
+const LDRAG={};
+function laserBody(y,on){return `<g class="laserbody" data-laser="1" role="slider" tabindex="0" aria-label="레이저 지시기 (위아래로 끌어 움직이기)" aria-valuenow="${Math.round(y)}">
+  <rect x="64" y="${y-22}" width="128" height="44" fill="transparent"/>
+  <rect x="70" y="${y-17}" width="100" height="34" rx="5" fill="#1d1f23" stroke="#000"/><rect x="168" y="${y-12}" width="10" height="24" rx="2" fill="#7b858c"/>
+  <circle class="pwr" data-power="1" cx="110" cy="${y}" r="8" fill="${on?'#ff4040':'#8f1d21'}" stroke="#fff" stroke-width="1.5"/>
+  ${on?`<circle cx="178" cy="${y}" r="9" fill="url(#dotg)"/>`:''}</g>`;}
+function lensRender(k){
+  const L=S.lens[k],el=$('stage_'+k);if(!el)return;const dark=S.dark;
+  const beamA=L.on?(dark?1:0.22):0;
+  let traces='';if(L.on&&L.inSlot)L.traces.forEach((y,i)=>{traces+=beamLine(tracePts(k,y),dark?0.28:0.08,1.6);});
+  const lensShape=L.inSlot?`<g class="lensin" data-lensin="1" role="button" tabindex="0" aria-label="받침대에 끼운 렌즈 (끌어서 빼기)"><rect x="${LZ.xc-26}" y="${LZ.yc-LZ.H-10}" width="52" height="${2*LZ.H+20}" fill="transparent"/></g><path pointer-events="none" d="${lensOutline(k)}" fill="url(#glassg)" stroke="${dark?'#8fc7ee':'#6f9cbd'}" stroke-width="2" opacity="${dark?.75:1}"/><path d="M${LZ.xc} ${LZ.yc-LZ.H-8} V${LZ.yc-LZ.H} M${LZ.xc} ${LZ.yc+LZ.H} V${LZ.yc+LZ.H+8}" stroke="#2b2f36" stroke-width="5"/>`:'';
+  const lp=LDRAG[k]&&LDRAG[k].kind==='lens'?LDRAG[k].p:(L.lp||LZ.rest);
+  const loose=L.inSlot?'':`<g class="lensloose" data-lens="1" role="button" tabindex="0" aria-label="${k==='vx'?'볼록':'오목'} 렌즈 (끌어서 받침대 홈에 끼우기)" transform="translate(${f(lp.x)} ${f(lp.y)})">
+    <path d="M24 26 L58 60" stroke="#1d1f23" stroke-width="11" stroke-linecap="round"/><circle r="40" fill="#1d1f23"/><circle r="34" fill="url(#glassg)" stroke="#9fc6e3"/>${k==='cc'?'<circle r="18" fill="none" stroke="#9fc6e3" stroke-width="2"/>':''}
+    <path d="M-20 -14 Q-12 -26 2 -28" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <text y="62" x="-6" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2f36" font-family="sans-serif">${k==='vx'?'볼록 렌즈':'오목 렌즈'}</text></g>`;
+  const grab=LDRAG[k]&&LDRAG[k].kind==='lens'?hand(lp.x+30,lp.y+40,[0.5,0.87]):'';
+  const lHand=hand(92,L.y+12,[-0.62,0.78]);
+  el.innerHTML=uniq('L'+k,`<svg viewBox="0 0 800 440" role="application" aria-label="${k==='vx'?'볼록':'오목'} 렌즈 실험대 (위에서 내려다본 모습)">${BEAMDEF}${pfx('L'+k,DEFS)}
+   <rect width="800" height="440" fill="#e9eef1"/>
+   <g filter="url(#L${k}Shadow)"><rect x="20" y="40" width="760" height="360" rx="10" fill="#f7d35a" stroke="#c99a10" stroke-width="2"/></g>
+   <rect x="20" y="40" width="760" height="18" rx="9" fill="#fbe08a" opacity=".8"/>
+   <rect x="${LZ.xc-7}" y="${LZ.yc-LZ.H-14}" width="14" height="${2*LZ.H+28}" rx="4" fill="#d9a920" stroke="#b8860b" stroke-dasharray="${L.inSlot?'0':'6 4'}"/>
+   ${L.inSlot?'':`<text x="${LZ.xc}" y="${LZ.yc+LZ.H+34}" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6400" font-family="sans-serif">렌즈를 끼우는 홈</text>`}
+   <text x="770" y="390" text-anchor="end" font-size="13" fill="#8a6400" font-family="sans-serif">받침대 (위에서 내려다본 모습)</text>
+   <rect class="room" width="800" height="440" fill="#05070d" opacity="${dark?0.8:0}"/>
+   ${traces}${lensShape}${beamLine(L.on?tracePts(k,L.y):null,beamA)}
+   ${laserBody(L.y,L.on)}${lHand}
+   ${L.on?'':`<text x="120" y="${L.y-28}" text-anchor="middle" font-size="12" font-weight="700" fill="${dark?'#ffb3b3':'#8f1d21'}" font-family="sans-serif">빨간 버튼: 켜기</text>`}
+   ${L.on&&L.inSlot&&L.traces.length?`<text x="34" y="392" font-size="13" font-weight="700" fill="${dark?'#ffb3b3':'#8f1d21'}" font-family="sans-serif">흐린 선: 앞에서 비춰 본 빛의 길 (위치를 바꿔 비출수록 쌓여요)</text>`:''}
+   ${loose}${grab}${switchSvg(736,62)}${gogObj(300,368,dark)}
+   ${gogOverlay(800,440,'L'+k)}
+  </svg>`);
+  lensChecks(k);
+}
+function lensChecks(k){
+  const L=S.lens[k],c=x=>L.obs[x]?'✓':'○';
+  $('obs_'+k).innerHTML=`렌즈의 <b>위쪽</b> ${c('top')} · <b>가운데</b> ${c('mid')} · <b>아래쪽</b> ${c('bot')}`;
+  $('laser_'+k).textContent=L.on?'레이저 끄기':'레이저 켜기';
+  let m;
+  if(!L.inSlot) m=k==='vx'?'<b>① 볼록 렌즈를 끌어서</b> 받침대의 홈(점선)에 끼워요.':'<b>④ 오목 렌즈를 끌어서</b> 받침대의 홈(점선)에 끼워요.';
+  else if(!S.dark&&!L.on) m='<b>② 교실 불 스위치</b>를 눌러 교실을 어둡게 해요.';
+  else if(!S.goggles&&!L.on) m='레이저 지시기를 켜기 전에 실험대 아래쪽의 <b>레이저 보안경을 눌러</b> 써요.';
+  else if(!L.on) m='레이저 지시기의 <b>빨간 버튼</b>을 눌러 렌즈를 향해 켜요.';
+  else if(!S.dark) m='<b>교실이 밝아서 빛의 길이 잘 보이지 않아요.</b> 교실 불을 꺼 보세요.';
+  else if(lensDone(k)) m='<b>빛이 렌즈의 위쪽, 가운데, 아래쪽을 지날 때를 모두 관찰했어요!</b> 흐린 선은 지금까지 관찰한 빛의 길이에요. 아래 문제를 풀어 봐요.';
+  else m=`<b>③ 레이저 지시기를 위아래로 끌어 움직이며</b> 빛이 ${k==='vx'?'볼록':'오목'} 렌즈를 통과한 뒤 나아가는 모습을 관찰해요.<br><span class="hint">위에서 내려다본 모습이라 실제 실험의 ‘좌우’가 화면에서는 ‘위아래’예요. 손을 떼면 그 빛의 길이 흐리게 남아요.</span>`;
+  if(LDRAG[k]&&LDRAG[k].msg) m=`<b>${LDRAG[k].msg}</b>`;
+  $('status_'+k).innerHTML=m;
+  renderLensQ(k);
+}
+function buildLens(k){
+  const el=$('stage_'+k);lensRender(k);
+  el.addEventListener('pointerdown',ev=>{
+    const svg=el.querySelector('svg');if(!svg)return;ac();const p=svgPt(svg,ev),L=S.lens[k];
+    if(ev.target.closest('[data-light]')){toggleDark();return;}
+    if(ev.target.closest('[data-gog]')){wearGoggles(true);return;}
+    if(ev.target.closest('[data-gogoff]')){wearGoggles(false);return;}
+    if(ev.target.closest('[data-power]')){powerLaser(k);return;}
+    if(!L.inSlot&&ev.target.closest('[data-lens]')){LDRAG[k]={kind:'lens',p:{x:p.x,y:p.y}};}
+    else if(L.inSlot&&ev.target.closest('[data-lensin]')){LDRAG[k]={kind:'pull',sx:p.x,sy:p.y};}
+    else if(ev.target.closest('[data-laser]')){LDRAG[k]={kind:'laser',oy:p.y-L.y};}
+    else return;
+    try{el.setPointerCapture(ev.pointerId);}catch(_){} ev.preventDefault();
+  });
+  el.addEventListener('pointermove',ev=>{
+    const d=LDRAG[k];if(!d||!d.kind)return;const svg=el.querySelector('svg'),p=svgPt(svg,ev),L=S.lens[k];
+    if(d.kind==='pull'){if(Math.hypot(p.x-d.sx,p.y-d.sy)<25)return;L.inSlot=false;L.on=false;d.kind='lens';tone(380,0.07,0.06);}
+    if(d.kind==='lens'){d.p={x:Math.max(50,Math.min(750,p.x)),y:Math.max(50,Math.min(390,p.y))};}
+    else{L.y=Math.max(LZ.ymin,Math.min(LZ.ymax,p.y-d.oy));if(L.on&&S.dark&&L.inSlot){const c=catOf(L.y);if(c&&!L.obs[c]){L.obs[c]=true;tone(1100,0.08,0.05,'sine');renderSteps();}}}
+    lensRender(k);
+  });
+  const end=()=>{const d=LDRAG[k];if(!d||!d.kind)return;const L=S.lens[k];if(d.kind==='pull'){LDRAG[k]={};return;}
+    if(d.kind==='lens'){if(Math.abs(d.p.x-LZ.slot.x)<80&&Math.abs(d.p.y-LZ.slot.y)<110){L.inSlot=true;tone(500,0.08,0.07);}else L.lp=d.p;}
+    else if(L.on&&S.dark&&L.inSlot){L.traces=L.traces.filter(y=>Math.abs(y-L.y)>8);L.traces.push(L.y);if(L.traces.length>8)L.traces.shift();}
+    LDRAG[k]={};save();lensRender(k);};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+  el.addEventListener('keydown',ev=>{const L=S.lens[k];
+    if(ev.target.closest('[data-laser]')&&(ev.key==='ArrowUp'||ev.key==='ArrowDown')){ev.preventDefault();L.y=Math.max(LZ.ymin,Math.min(LZ.ymax,L.y+(ev.key==='ArrowUp'?-10:10)));
+      if(L.on&&S.dark&&L.inSlot){const c=catOf(L.y);if(c)L.obs[c]=true;L.traces=L.traces.filter(y=>Math.abs(y-L.y)>8);L.traces.push(L.y);if(L.traces.length>8)L.traces.shift();}save();lensRender(k);el.querySelector('[data-laser]').focus();}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-lens]')){ev.preventDefault();L.inSlot=true;save();lensRender(k);}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-light]')){ev.preventDefault();toggleDark();}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-gog]')){ev.preventDefault();wearGoggles(true);}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-gogoff]')){ev.preventDefault();wearGoggles(false);}});
+  $('laser_'+k).addEventListener('click',()=>{ac();powerLaser(k);});
+  $('redo_'+k).addEventListener('click',()=>{S.lens[k]=lensDefaults();S.qa[k]={};S.qg[k]=false;LDRAG[k]={};save();lensRender(k);renderSteps();});
+}
+function powerLaser(k){const L=S.lens[k];
+  if(!L.on&&!S.goggles){LDRAG[k]={msg:'앗! 레이저 지시기를 켜기 전에 레이저 보안경을 먼저 써요.'};lensRender(k);LDRAG[k]={};return;}
+  if(!L.on&&!L.inSlot){LDRAG[k]={msg:'먼저 렌즈를 받침대 홈에 끼워요.'};lensRender(k);LDRAG[k]={};return;}
+  L.on=!L.on;tone(L.on?880:440,0.08,0.06);save();lensRender(k);}
+
+/* ---- 렌즈 문제 ---- */
+function lensMini(mode){
+  const ys=[28,50,72];let r='';
+  ys.forEach(y=>{const h=y-50;let y2=y,yE=y;if(mode==='conv'){y2=y;yE=50+(-h)*0.9;}else if(mode==='div'){yE=y+h*1.4;}
+    r+=`<path d="M8 ${y} L80 ${y} L152 ${f(yE)}" fill="none" stroke="#e02424" stroke-width="2.2" stroke-linejoin="round"/>`;});
+  return `<svg viewBox="0 0 160 100" class="qmini" aria-hidden="true"><rect width="160" height="100" rx="8" fill="#fff8dc"/><path d="M80 12 V88" stroke="#7fb3d5" stroke-width="6" opacity=".6"/>${r}</svg>`;
+}
+const LQ={vx:{pics:[['conv','가운데로 모여요'],['par','그대로 나아가요'],['div','바깥쪽으로 퍼져요']],ans:'conv',
+  s1:{pre:'볼록 렌즈의 가장자리를 통과한 빛은',opts:['렌즈의 가운데 쪽으로 꺾여 나아갑니다','렌즈의 바깥쪽으로 꺾여 나아갑니다'],ans:'렌즈의 가운데 쪽으로 꺾여 나아갑니다'}},
+ cc:{pics:[['conv','가운데로 모여요'],['par','그대로 나아가요'],['div','바깥쪽으로 퍼져요']],ans:'div',
+  s1:{pre:'오목 렌즈의 가장자리를 통과한 빛은',opts:['렌즈의 가운데 쪽으로 꺾여 나아갑니다','렌즈의 바깥쪽으로 꺾여 나아갑니다'],ans:'렌즈의 바깥쪽으로 꺾여 나아갑니다'}}};
+const MID={pre:'렌즈의 가운데를 통과한 빛은',opts:['꺾이지 않고 그대로 나아갑니다','꺾여 나아갑니다'],ans:'꺾이지 않고 그대로 나아갑니다'};
+function choiceBtns(opts,selected,attr,graded,answer,dis){return opts.map(o=>{const on=selected===o;let cls='choice';if(graded&&on)cls+=o===answer?' right':' wrong';
+  return `<button type="button" class="${cls}" ${attr}="${esc(o)}" aria-pressed="${on}" ${dis?'disabled':''}>${esc(o)}</button>`;}).join('');}
+function lensItems(k){const a=S.qa[k]||{},Q=LQ[k];return [a.pic===Q.ans,a.s1===Q.s1.ans,a.mid===MID.ans];}
+function renderLensQ(k){
+  const a=S.qa[k]||(S.qa[k]={}),Q=LQ[k],g=S.qg[k],ready=lensDone(k);
+  $('q_'+k).innerHTML=`<div class="picchoices">${Q.pics.map(([m,t])=>{let cls='picchoice';if(g&&a.pic===m)cls+=m===Q.ans?' right':' wrong';
+      return `<button type="button" class="${cls}" data-lq="${k}|pic|${m}" aria-pressed="${a.pic===m}" ${ready?'':'disabled'}>${lensMini(m)}<span>${t}</span></button>`;}).join('')}</div>
+    <div class="sentence">• ${Q.s1.pre} ( <span class="blank">${choiceBtns(Q.s1.opts,a.s1,`data-lq="${k}|s1" data-v`,g,Q.s1.ans,!ready)}</span> ).</div>
+    <div class="sentence">• ${MID.pre} ( <span class="blank">${choiceBtns(MID.opts,a.mid,`data-lq="${k}|mid" data-v`,g,MID.ans,!ready)}</span> ).</div>`;
+  $('qlock_'+k).textContent=ready?'관찰한 빛의 길을 떠올리며 골라요.':'렌즈의 위쪽, 가운데, 아래쪽으로 빛을 모두 비춰 보면 풀 수 있어요.';
+  $('qgrade_'+k).disabled=!ready;
+  if(g){const r=lensItems(k),ok=r.filter(Boolean).length;
+    $('qfb_'+k).innerHTML=`<div class="fb ${ok===3?'ok':'bad'}"><span class="ox ${ok===3?'o':'x'}">${ok===3?'O':'X'}</span>${ok===3?(k==='vx'?'모두 맞았어요! 볼록 렌즈를 통과한 빛은 가운데 쪽으로 꺾여 한곳으로 모여요.':'모두 맞았어요! 오목 렌즈를 통과한 빛은 바깥쪽으로 꺾여 퍼져 나가요.'):`3개 중 ${ok}개 맞았어요. 실험대에 남은 흐린 빛의 길을 다시 살펴보세요.`}</div>`;}
+  else $('qfb_'+k).innerHTML='';
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-lq]');if(!b||b.disabled)return;const [k,f2,m]=b.dataset.lq.split('|');const a=S.qa[k]||(S.qa[k]={});a[f2]=m||b.dataset.v;S.qg[k]=false;save();renderLensQ(k);renderSteps();});
+['vx','cc'].forEach(k=>$('qgrade_'+k).addEventListener('click',()=>{const a=S.qa[k]||{};if(!a.pic||!a.s1||!a.mid){$('qfb_'+k).innerHTML='<div class="fb bad">그림과 두 문장을 모두 골라 주세요.</div>';return;}S.qg[k]=true;save();renderLensQ(k);renderSteps();}));
+
+/* ================= 실험해요 2-① 우유 물 ================= */
+const TK={x0:280,x1:660,top:200,bot:440,wy:270};
+const CART={x0:66,x1:170,top:310,bot:440,mouth:{x:150,y:296}};
+const DREST={x:228,y:428},RREST={x:735,y:432};
+let MD=null,squeezeT=0;
+function milkiness(){const m=S.milk;return Math.min(1,m.drops/5)*Math.min(1,m.stir);}
+function waterFill(dark){const k=milkiness();return dark?`rgba(40,70,100,${f(.55+k*.1)})`:`rgba(${f(140+k*80)},${f(195+k*40)},${f(232+k*15)},.55)`;}
+function dropperSvg(p,fill,sq,held){
+  const b=sq?'scale(.72 1)':'';
+  return `<g transform="translate(${f(p.x)} ${f(p.y)})" class="dropper" data-dropper="1" role="button" tabindex="0" aria-label="스포이트 (끌어서 옮기기, 눌러서 짜기)">
+   <rect x="-22" y="-165" width="44" height="170" fill="transparent"/>
+   <path d="M-5 -110 V-22 L-1.5 0 H1.5 L5 -22 V-110Z" fill="rgba(225,242,255,.7)" stroke="#8fb3cf" stroke-width="1.5"/>
+   ${fill>0?`<path d="M-4 ${-22-fill*14} V-22 L-1 -1 H1 L4 -22 V${-22-fill*14}Z" fill="#fffdf5" stroke="#e8e2d0" stroke-width=".8"/>`:''}
+   <g transform="translate(0 -128) ${b}"><rect x="-10" y="-34" width="20" height="40" rx="10" fill="#e8603c" stroke="#b8442a" stroke-width="1.5"/><path d="M-5 -28 Q-6 -10 -5 0" stroke="#ffb59e" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+   ${held?'':''}</g>`;
+}
+function rodSvg(p,held){ // p = 위 끝
+  const b={x:p.x+(held?0:-70),y:p.y+(held?175:-30)};
+  return `<g class="rod" data-rod="1" role="button" tabindex="0" aria-label="유리 막대 (끌어서 물을 젓기)"><path d="M${f(p.x)} ${f(p.y)} L${f(b.x)} ${f(b.y)}" stroke="transparent" stroke-width="30"/>
+   <path d="M${f(p.x)} ${f(p.y)} L${f(b.x)} ${f(b.y)}" stroke="#d7ecf8" stroke-width="9" stroke-linecap="round" opacity=".9"/><path d="M${f(p.x)} ${f(p.y)} L${f(b.x)} ${f(b.y)}" stroke="#8fb3cf" stroke-width="1.4" stroke-linecap="round"/><path d="M${f(p.x-2)} ${f(p.y+6)} L${f(b.x-2)} ${f(b.y-6)}" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/></g>`;
+}
+const rodBottom=p=>({x:p.x,y:p.y+175});
+function tankSvg(dark,inner){
+  return `<path d="M${TK.x0} ${TK.top} V${TK.bot} H${TK.x1} V${TK.top}" fill="none" stroke="${dark?'#4b6578':'#8fb3cf'}" stroke-width="5" stroke-linejoin="round"/>
+   <rect x="${TK.x0+3}" y="${TK.wy}" width="${TK.x1-TK.x0-6}" height="${TK.bot-TK.wy-3}" fill="${waterFill(dark)}"/><rect x="${TK.x0+3}" y="${TK.wy}" width="${TK.x1-TK.x0-6}" height="${TK.bot-TK.wy-3}" fill="#fffdf6" opacity="${f(dark?0:milkiness()*0.42)}"/>${inner||''}
+   <path d="M${TK.x0+3} ${TK.wy} H${TK.x1-3}" stroke="${dark?'#6d8aa0':'#dff1fb'}" stroke-width="2.5"/>
+   <path d="M${TK.x0+14} ${TK.top+10} V${TK.bot-12}" stroke="#fff" stroke-width="3" opacity="${dark?.15:.55}"/>`;
+}
+function milkRender(){
+  const m=S.milk,el=$('stage_milk');if(!el)return;
+  const dp=MD&&MD.kind==='dropper'?MD.p:(m.dp||DREST),rp=MD&&MD.kind==='rod'?MD.p:(m.rp||RREST),rodHeld=(MD&&MD.kind==='rod')||!!m.rp;
+  const sq=performance.now()<squeezeT;const st=Math.min(1,m.stir);
+  const blobs=m.blobs.map((b,i)=>{const r=24+st*60,op=0.9*(1-st)+0.05;return `<g class="${i===m.blobs.length-1&&b.fresh?'cloudIn':''}"><ellipse cx="${f(b.x+st*(i%2?30:-30))}" cy="${f(TK.wy+30+b.d+st*50)}" rx="${f(r*1.2)}" ry="${f(r)}" fill="url(#cloudg)" opacity="${f(op)}"/></g>`;}).join('');
+  const swirl=MD&&MD.kind==='rod'&&MD.inWater?`<path d="M${f(rodBottom(MD.p).x-40)} ${f(rodBottom(MD.p).y-30)} q40 -20 80 0" stroke="#fff" stroke-width="2" fill="none" opacity=".6" stroke-dasharray="4 6"/>`:'';
+  const carton=`<g class="carton" data-carton="1" role="button" tabindex="0" aria-label="우유갑 ${m.open?'(열려 있음)':'(눌러서 열기)'}">
+    <path d="M${CART.x0} ${CART.top} L${CART.x0+52} 270 L${CART.x1} ${CART.top} V${CART.bot} H${CART.x0}Z" fill="#fff" stroke="#9aa6ae" stroke-width="2"/>
+    <path d="M${CART.x0} ${CART.top} H${CART.x1}" stroke="#9aa6ae" stroke-width="2"/><rect x="${CART.x0}" y="340" width="${CART.x1-CART.x0}" height="46" fill="#4f8fd6"/>
+    <text x="${(CART.x0+CART.x1)/2}" y="371" text-anchor="middle" font-size="20" font-weight="700" fill="#fff" font-family="sans-serif">우유</text>
+    <path d="M${CART.x0+40} 266 H${CART.x0+66}" stroke="#9aa6ae" stroke-width="5"/>
+    ${m.open?`<path d="M${CART.x0+66} 279 L${CART.mouth.x+16} 284 L${CART.mouth.x+8} 306 L${CART.x0+76} 300Z" fill="#f4f1e8" stroke="#9aa6ae" stroke-width="1.5"/><ellipse cx="${CART.mouth.x}" cy="${CART.mouth.y}" rx="11" ry="6" fill="#fffdf5" stroke="#9aa6ae"/>`
+      :`<path d="M${CART.x0+66} 279 L${CART.x1-4} 304" stroke="#c3ccd2" stroke-width="2" stroke-dasharray="4 3"/><circle class="pulse" cx="${CART.mouth.x}" cy="${CART.mouth.y-2}" r="22" fill="none" stroke="#e0a400" stroke-width="3"/><text x="${CART.mouth.x+4}" y="255" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6400" font-family="sans-serif">눌러서 열기</text>`}</g>`;
+  const dHeld=!!(MD&&MD.kind==='dropper')||!!m.dp;
+  el.innerHTML=uniq('M',`<svg viewBox="0 0 800 480" role="application" aria-label="우유를 떨어뜨리고 젓는 실험대">${BEAMDEF}${pfx('M',DEFS)}
+   <rect width="800" height="480" fill="#eef3f6"/><rect y="440" width="800" height="40" fill="#d9cdb5"/><rect y="440" width="800" height="5" fill="#c4b494"/>
+   <text x="${(TK.x0+TK.x1)/2}" y="470" text-anchor="middle" font-size="13" fill="#6c5b3c" font-family="sans-serif">물이 든 투명한 플라스틱 통</text>
+   ${tankSvg(false,blobs+swirl)}${carton}
+   <rect x="${DREST.x-16}" y="400" width="32" height="40" rx="4" fill="#cfd8de" stroke="#9aa6ae"/><text x="${DREST.x}" y="470" text-anchor="middle" font-size="12" fill="#6c5b3c" font-family="sans-serif">스포이트</text>
+   <rect x="${RREST.x-58}" y="408" width="60" height="32" rx="4" fill="#cfd8de" stroke="#9aa6ae"/><text x="${RREST.x-28}" y="470" text-anchor="middle" font-size="12" fill="#6c5b3c" font-family="sans-serif">유리 막대</text>
+   ${rodSvg(rp,rodHeld)}${rodHeld?hand(rp.x+6,rp.y+18,[0.5,0.86]):''}
+   ${dropperSvg(dp,m.fill,sq)}${dHeld?hand(dp.x+8,dp.y-118,[0.55,0.83]):''}
+   <g id="milkFx" pointer-events="none"></g>
+   <text x="${TK.x0+6}" y="${TK.top-12}" text-anchor="start" font-size="16" font-weight="700" fill="#2b2f36" font-family="sans-serif">떨어뜨린 우유: ${m.drops}방울</text>
+  </svg>`);
+  milkStatus();
+}
+function milkStatus(){
+  const m=S.milk;let s;
+  if(MD&&MD.msg) s=`<b>${MD.msg}</b>`;
+  else if(!m.open) s='<b>우유갑 위쪽을 눌러</b> 우유갑을 열어요.';
+  else if(m.drops<4&&m.fill===0) s=`<b>스포이트를 끌어서</b> 우유갑 입구에 대고, <b>스포이트를 톡 눌러</b> 우유를 빨아들여요. (지금 ${m.drops}방울)`;
+  else if(m.drops<4) s=`스포이트에 우유가 들어 있어요. <b>스포이트를 통 위로 옮긴 뒤 톡 눌러</b> 한 방울씩 떨어뜨려요. (지금 ${m.drops}방울 · 4~5방울을 떨어뜨려요)`;
+  else if(m.stir<1) s=`<b>우유 ${m.drops}방울</b>을 넣었어요! ${m.drops<5?'한 방울 더 넣어도 되고, ':''}이제 <b>유리 막대를 끌어서 물속에 넣고 좌우로 저어</b> 골고루 섞어요. (젓기 ${Math.round(m.stir*100)}%)`;
+  else s='<b>물이 골고루 뿌옇게 되었어요!</b> 이런 물속에서는 빛이 지나가는 길이 잘 보여요. 이제 레이저 지시기의 빛을 물에 비춰 봐요.';
+  $('status_milk').innerHTML=s;$('milkBar').style.width=Math.round(((m.open?1:0)+Math.min(4,m.drops)+Math.min(1,m.stir)*3)/8*100)+'%';
+  $('milkNext').hidden=!milkDone();
+}
+function squeeze(){
+  const m=S.milk,p=m.dp||DREST;ac();squeezeT=performance.now()+220;
+  const tip=p,nearMouth=dist(tip,CART.mouth)<34,overTank=tip.x>TK.x0+14&&tip.x<TK.x1-14&&tip.y<TK.wy-6&&tip.y>60;
+  if(nearMouth){if(!m.open){MD={msg:'우유갑이 닫혀 있어요. 먼저 우유갑을 눌러 열어요.'};}
+    else if(m.fill>=3){MD={msg:'스포이트에 우유가 가득 찼어요. 통 위로 옮겨요.'};}
+    else{m.fill=3;sSuck();MD={msg:'스포이트에 우유를 빨아들였어요! 통 위로 옮겨 한 방울씩 떨어뜨려요.'};}}
+  else if(overTank){
+    if(m.fill<=0){MD={msg:'스포이트가 비었어요. 우유갑에서 우유를 다시 빨아들여요.'};}
+    else if(m.drops>=5){MD={msg:'4~5방울이면 충분해요. 너무 많이 넣으면 물이 너무 뿌예져요.'};}
+    else{m.fill--;m.drops++;MD=null;const x=tip.x,y=tip.y;m.blobs.forEach(b=>b.fresh=false);
+      $('milkFx').insertAdjacentHTML('beforeend',`<circle class="drop" cx="${f(x)}" cy="${f(y+4)}" r="5" fill="#fffdf5" stroke="#e5dfcf" style="--dy:${f(TK.wy-y-4)}px"/>`);
+      setTimeout(()=>{sPlip();m.blobs.push({x:x,d:(m.blobs.length%3)*14,fresh:true});save();milkRender();
+        $('milkFx').insertAdjacentHTML('beforeend',`<ellipse class="ripple" cx="${f(x)}" cy="${TK.wy}" rx="6" ry="2" fill="none" stroke="#fff" stroke-width="2"/>`);
+        renderSteps();},420);}}
+  else if(tip.y>=TK.wy-6&&tip.x>TK.x0&&tip.x<TK.x1){MD={msg:'스포이트 끝을 물 위에 두고 눌러야 한 방울씩 떨어져요.'};}
+  else MD={msg:m.fill>0?'통 위로 옮긴 뒤 눌러요.':'우유갑 입구에 대고 눌러 우유를 빨아들여요.'};
+  save();milkRender();if(MD&&MD.msg){setTimeout(()=>{if(MD&&MD.msg){MD=null;milkStatus();}},2600);}
+}
+function buildMilk(){
+  const el=$('stage_milk');milkRender();
+  el.addEventListener('pointerdown',ev=>{
+    const svg=el.querySelector('svg');if(!svg)return;ac();const p=svgPt(svg,ev),m=S.milk;
+    if(ev.target.closest('[data-carton]')){if(!m.open){m.open=true;burst(0.18,1800,0.8,0.12);save();milkRender();}return;}
+    if(ev.target.closest('[data-dropper]')){const dp=m.dp||DREST;MD={kind:'dropper',ox:p.x-dp.x,oy:p.y-dp.y,sx:p.x,sy:p.y,moved:false,p:{...dp}};}
+    else if(ev.target.closest('[data-rod]')){const rp=m.rp||RREST;MD={kind:'rod',ox:m.rp?p.x-rp.x:0,oy:m.rp?p.y-rp.y:20,sx:p.x,sy:p.y,moved:false,p:{x:p.x,y:p.y-20},lx:p.x};}
+    else return;
+    try{el.setPointerCapture(ev.pointerId);}catch(_){} ev.preventDefault();
+  });
+  el.addEventListener('pointermove',ev=>{
+    if(!MD||!MD.kind)return;const svg=el.querySelector('svg'),p=svgPt(svg,ev),m=S.milk;
+    if(!MD.moved&&Math.hypot(p.x-MD.sx,p.y-MD.sy)<6)return;MD.moved=true;
+    if(MD.kind==='dropper'){MD.p={x:Math.max(30,Math.min(770,p.x-MD.ox)),y:Math.max(175,Math.min(436,p.y-MD.oy))};m.dp=MD.p;}
+    else{let np={x:Math.max(40,Math.min(760,p.x-MD.ox)),y:Math.max(20,p.y-MD.oy)};const b=rodBottom(np);
+      if(b.y>TK.bot-8)np.y=TK.bot-8-175; if(b.x>TK.x0-4&&b.x<TK.x1+4&&b.y>TK.top-6&&(np.x<TK.x0+12||np.x>TK.x1-12)&&b.y>TK.wy)np.x=Math.max(TK.x0+12,Math.min(TK.x1-12,np.x));
+      const bb=rodBottom(np);MD.inWater=bb.x>TK.x0&&bb.x<TK.x1&&bb.y>TK.wy+20;
+      if(MD.inWater&&m.drops>0){const dx=Math.abs(np.x-MD.p.x);m.stir=Math.min(1,m.stir+dx/2200);if(dx>3&&Math.random()<.2)burst(0.06,900,1,0.04);}
+      MD.p=np;m.rp=np;}
+    milkRender();
+  });
+  const end=()=>{if(!MD||!MD.kind)return;const d=MD,m=S.milk;MD=null;
+    if(d.kind==='dropper'){if(!d.moved)squeeze();else if(dist(d.p,DREST)<40)m.dp=null;}
+    else{if(d.moved&&dist(d.p,{x:RREST.x,y:RREST.y-170})<70)m.rp=null;
+      if(!d.moved&&!m.rp){MD={msg:'유리 막대를 끌어서 통 안의 물에 넣고 좌우로 움직여요.'};setTimeout(()=>{MD=null;milkStatus();},2400);}}
+    save();milkRender();renderSteps();};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+  el.addEventListener('keydown',ev=>{if(ev.key!=='Enter'&&ev.key!==' ')return;const m=S.milk;
+    if(ev.target.closest('[data-carton]')){ev.preventDefault();m.open=true;save();milkRender();}
+    else if(ev.target.closest('[data-dropper]')){ev.preventDefault();squeeze();}});
+  $('milkRedo').addEventListener('click',()=>{S.milk=fresh().milk;MD=null;save();milkRender();renderSteps();});
+}
+
+/* ================= 실험해요 2-②③ 물에 비추기 ================= */
+const PV={x:470,y:TK.wy},WR=205,N2=1.33,SREST={x:712,y:150};
+let mist=0,mistRAF=0,WD=null;
+function refr(th){return Math.asin(Math.sin(Math.abs(th)*D2R)/N2)/D2R*Math.sign(th||0);}
+function waterPath(th){const r=refr(th),dx=Math.sin(r*D2R),dy=Math.cos(r*D2R);let t=(TK.bot-4-PV.y)/dy;
+  if(dx>0)t=Math.min(t,(TK.x1-4-PV.x)/dx);if(dx<0)t=Math.min(t,(TK.x0+4-PV.x)/dx);return [[PV.x,PV.y],[PV.x+dx*t,PV.y+dy*t]];}
+function laserTip(th){return {x:PV.x-Math.sin(th*D2R)*WR,y:PV.y-Math.cos(th*D2R)*WR};}
+function pointerSvg(th,on){const t=laserTip(th),a=Math.atan2(PV.y-t.y,PV.x-t.x)/D2R;
+  return `<g class="penlaser" data-pen="1" role="slider" tabindex="0" aria-label="레이저 지시기 (끌어서 비추는 각도 바꾸기)" aria-valuenow="${Math.round(th)}" transform="translate(${f(t.x)} ${f(t.y)}) rotate(${f(a)})">
+   <rect x="-150" y="-16" width="160" height="32" fill="transparent"/>
+   <rect x="-130" y="-7" width="122" height="14" rx="7" fill="#2b2f36"/><rect x="-12" y="-6" width="14" height="12" rx="3" fill="#9aa4ab"/>
+   <rect x="-82" y="-10" width="14" height="5" rx="2" fill="${on?'#ff4040':'#8f1d21'}" class="pwr" data-wpower="1"/>
+   ${on?'<circle cx="3" r="7" fill="url(#dotg)"/>':''}</g>
+   ${hand(t.x-Math.cos(a*D2R)*92,t.y-Math.sin(a*D2R)*92,[-Math.cos(a*D2R),-Math.sin(a*D2R)])}`;}
+function sprayerSvg(p){return `<g class="sprayer" data-spray="1" role="button" tabindex="0" aria-label="분무기 (끌어서 옮기기, 눌러서 뿌리기)" transform="translate(${f(p.x)} ${f(p.y)})">
+   <rect x="-44" y="-40" width="90" height="120" fill="transparent"/>
+   <path d="M-16 6 H18 Q30 6 32 20 V64 Q32 74 22 74 H-22 Q-32 74 -32 64 V20 Q-30 6 -16 6Z" fill="#2f7ed8" opacity=".88" stroke="#1f5fa8" stroke-width="2"/>
+   <path d="M-24 40 Q0 34 24 40 V64 Q24 70 18 70 H-18 Q-24 70 -24 64Z" fill="#8fc3ea" opacity=".6"/>
+   <rect x="-10" y="-14" width="26" height="20" fill="#e9eef2" stroke="#9aa6ae"/><path d="M-10 -12 H-36 V-2 H-10" fill="#e9eef2" stroke="#9aa6ae"/><path d="M4 6 L0 26 L14 22" fill="#e9eef2" stroke="#9aa6ae"/>
+   <text x="0" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="${S.dark?'#9fc6e3':'#1f5fa8'}" font-family="sans-serif">분무기</text></g>${hand(p.x+14,p.y+24,[0.55,0.83])}`;}
+function nozzle(){const p=S.wl.sp||SREST;return {x:p.x-36,y:p.y-7};}
+function wRender(){
+  const el=$('stage_water');if(!el)return;const W=S.wl,dark=S.dark,th=W.th,on=W.on;
+  const k=Math.max(0.35,milkiness()),airA=on?(dark?Math.min(1,mist*1.1):0.12*mist):0,wA=on?(dark?0.4+0.6*k:0.18):0,r=refr(th);
+  const angles=on&&$('angChk').checked;
+  el.innerHTML=uniq('W',`<svg viewBox="0 0 800 480" role="application" aria-label="레이저 지시기의 빛을 물에 비추는 실험대">${BEAMDEF}${pfx('W',DEFS)}
+   <rect width="800" height="480" fill="#eef3f6"/><rect y="440" width="800" height="40" fill="#d9cdb5"/>
+   ${tankSvg(false,'')}
+   <rect class="room" width="800" height="480" fill="#05070d" opacity="${dark?0.82:0}"/>
+   ${dark?`<path d="M${TK.x0} ${TK.top} V${TK.bot} H${TK.x1} V${TK.top}" fill="none" stroke="#3d5568" stroke-width="4"/><rect x="${TK.x0+3}" y="${TK.wy}" width="${TK.x1-TK.x0-6}" height="${TK.bot-TK.wy-3}" fill="rgba(120,150,175,${f(.08+k*.08)})"/><path d="M${TK.x0+3} ${TK.wy} H${TK.x1-3}" stroke="#5f7d93" stroke-width="2"/>`:''}
+   <g id="mistBeam">${beamLine(on?[[laserTip(th).x,laserTip(th).y],[PV.x,PV.y]]:null,airA,2.4)}</g>
+   ${beamLine(on?waterPath(th):null,wA,3.2)}
+   ${on?`<circle cx="${PV.x}" cy="${PV.y}" r="${dark?11:7}" fill="url(#dotg)"/>`:''}
+   ${angles?angleOverlay(th,r):''}
+   <g id="mistFx" pointer-events="none"></g>
+   ${pointerSvg(th,on)}${sprayerSvg(W.sp||SREST)}${switchSvg(20,20)}${gogObj(170,452,dark)}
+   <text x="${TK.x0+10}" y="${TK.wy-8}" font-size="13" font-weight="700" fill="${dark?'#9fc6e3':'#4c6b80'}" font-family="sans-serif">공기</text>
+   <text x="${TK.x0+10}" y="${TK.wy+22}" font-size="13" font-weight="700" fill="${dark?'#9fc6e3':'#1f5fa8'}" font-family="sans-serif">물</text>
+   ${gogOverlay(800,480,'W')}
+  </svg>`);
+  wStatus();
+}
+function angleOverlay(th,r){
+  const R1=110,R2=120,arc=(a0,a1,rad,down)=>{const s=down?1:-1,p0={x:PV.x+Math.sin(a0*D2R)*rad*(down?1:-1),y:PV.y+s*Math.cos(a0*D2R)*rad},p1={x:PV.x+Math.sin(a1*D2R)*rad*(down?1:-1),y:PV.y+s*Math.cos(a1*D2R)*rad};
+    return `M${f(p0.x)} ${f(p0.y)} A${rad} ${rad} 0 0 ${a1>a0?(down?0:1):(down?1:0)} ${f(p1.x)} ${f(p1.y)}`;};
+  const c='#ffd23f';
+  return `<path d="M${PV.x} ${PV.y-150} V${PV.y+160}" stroke="${c}" stroke-width="1.6" stroke-dasharray="6 5" opacity=".9"/>
+   ${Math.abs(th)>0.5?`<path d="${arc(0,th,R1,false)}" fill="none" stroke="${c}" stroke-width="2"/><text x="${f(PV.x-Math.sin(th/2*D2R)*(R1+22))}" y="${f(PV.y-Math.cos(th/2*D2R)*(R1+22)+5)}" text-anchor="middle" font-size="15" font-weight="700" fill="${c}" font-family="sans-serif">${Math.round(Math.abs(th))}°</text>
+   <path d="${arc(0,r,R2,true)}" fill="none" stroke="#7fe0ff" stroke-width="2"/><text x="${f(PV.x+Math.sin(r/2*D2R)*(R2+22))}" y="${f(PV.y+Math.cos(r/2*D2R)*(R2+22)+5)}" text-anchor="middle" font-size="15" font-weight="700" fill="#7fe0ff" font-family="sans-serif">${Math.round(Math.abs(r))}°</text>`:`<text x="${PV.x+10}" y="${PV.y-130}" font-size="14" font-weight="700" fill="${c}" font-family="sans-serif">0° (수직)</text>`}`;
+}
+function wStatus(){
+  const W=S.wl;let s;
+  if(WD&&WD.msg) s=`<b>${WD.msg}</b>`;
+  else if(!S.dark) s='<b>② 교실 불 스위치</b>를 눌러 교실을 어둡게 해요.';
+  else if(!S.goggles&&!W.on) s='레이저 지시기를 켜기 전에 책상 위의 <b>레이저 보안경을 눌러</b> 써요.';
+  else if(!W.on) s='레이저 지시기의 <b>빨간 버튼</b>(또는 ‘레이저 켜기’)을 눌러 켜요.';
+  else if(mist<0.15) s=`물속에서는 빛의 길이 보이지만, 공기 중에서는 잘 보이지 않아요. <b>③ 분무기를 레이저 지시기 앞쪽으로 옮겨 톡 눌러</b> 물을 뿌려 보세요.<br><span class="hint">레이저 지시기를 끌면 비추는 각도가 바뀌어요. (지금 ${Math.round(Math.abs(W.th))}°)</span>`;
+  else s=`<b>공기 중의 물방울 덕분에 빛의 길이 보여요!</b> 빛이 공기에서 물로 들어갈 때 어떻게 나아가는지 살펴보고 <b>‘이 각도 기록하기’</b>를 눌러요. (지금 ${Math.round(Math.abs(W.th))}°)`;
+  $('status_water').innerHTML=s;$('wlaser').textContent=W.on?'레이저 끄기':'레이저 켜기';
+  $('recBtn').disabled=!(W.on&&S.dark);
+}
+let PARTS=[],PUFFS=[],lastT=0;
+function spray(){
+  ac();sSpray();mist=1;const n=nozzle();
+  for(let i=0;i<75;i++){const a=(180+(Math.random()*2-1)*(i<20?8:20))*D2R,sp=230+Math.random()*420;
+    PARTS.push({x:n.x,y:n.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-20,r:0.9+Math.random()*2.6,life:0,max:1.1+Math.random()*1.1,d:Math.random()*0.12});}
+  for(let i=0;i<6;i++){const d=50+i*38+Math.random()*20;PUFFS.push({x:n.x-d,y:n.y+(Math.random()*24-8)+d*0.12,r0:14+i*4,life:0,max:2.2+Math.random()*0.8,d:i*0.05});}
+  PUFFS.push({x:n.x-6,y:n.y,r0:8,life:0,max:0.25,d:0,flash:true});
+  if(PARTS.length>260)PARTS=PARTS.slice(-260);
+  lastT=0;if(!mistRAF)mistRAF=requestAnimationFrame(mistTick);wStatus();
+}
+function segD(px,py,a,b){const vx=b.x-a.x,vy=b.y-a.y,l2=vx*vx+vy*vy;let t=((px-a.x)*vx+(py-a.y)*vy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(a.x+vx*t),py-(a.y+vy*t));}
+function mistTick(ts){
+  const dt=lastT?Math.min(0.05,(ts-lastT)/1000):0.016;lastT=ts;
+  mist=Math.max(0,mist-0.0058);const W=S.wl,dark=S.dark,on=W.on,tip=laserTip(W.th);
+  const g=$('mistBeam');
+  if(g){const airA=on?(dark?Math.min(1,mist*1.1):0.12*mist):0;g.innerHTML=uniq('W',beamLine(on?[[tip.x,tip.y],[PV.x,PV.y]]:null,airA,2.4));}
+  let h='';
+  PUFFS.forEach(p=>{if(p.d>0){p.d-=dt;return;}p.life+=dt;const k=p.life/p.max;if(k>=1)return;
+    if(p.flash){h+=`<ellipse cx="${f(p.x)}" cy="${f(p.y)}" rx="${f(10+k*30)}" ry="${f(6+k*14)}" fill="#ffffff" opacity="${f((1-k)*0.8)}"/>`;return;}
+    const r=p.r0+k*60;h+=`<circle cx="${f(p.x-k*30)}" cy="${f(p.y+k*18)}" r="${f(r)}" fill="url(#Wpuff)" opacity="${f((1-k)*(k<.15?k/.15:1)*(dark?0.55:0.75))}"/>`;});
+  PUFFS=PUFFS.filter(p=>p.life<p.max);
+  PARTS.forEach(p=>{if(p.d>0){p.d-=dt;return;}p.life+=dt;p.vx*=Math.pow(0.12,dt);p.vy=p.vy*Math.pow(0.2,dt)+140*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
+    const k=p.life/p.max;if(k>=1)return;const op=(1-k)*(k<0.08?k/0.08:1);
+    const lit=on&&dark&&segD(p.x,p.y,tip,PV)<9;
+    if(lit) h+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.r*2.6)}" fill="#ff4a4a" opacity="${f(op*0.45)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.r*1.2)}" fill="#ffd6d6" opacity="${f(op)}"/>`;
+    else h+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.r)}" fill="${dark?'#c3e2f7':'#5aa9e6'}" opacity="${f(op*(dark?0.8:0.85))}"/>${p.r>2.2?`<circle cx="${f(p.x-p.r*0.35)}" cy="${f(p.y-p.r*0.35)}" r="${f(p.r*0.35)}" fill="#fff" opacity="${f(op*0.9)}"/>`:''}`;});
+  PARTS=PARTS.filter(p=>p.life<p.max);
+  const fx=$('mistFx');if(fx)fx.innerHTML=h;
+  if(mist>0||PARTS.length||PUFFS.length){mistRAF=requestAnimationFrame(mistTick);}else{mistRAF=0;lastT=0;wStatus();}
+  if(mist<0.15&&mist>0.144)wStatus();}
+function buildWater(){
+  const el=$('stage_water');wRender();
+  el.addEventListener('pointerdown',ev=>{
+    const svg=el.querySelector('svg');if(!svg)return;ac();const p=svgPt(svg,ev),W=S.wl;
+    if(ev.target.closest('[data-light]')){toggleDark();return;}
+    if(ev.target.closest('[data-gog]')){wearGoggles(true);return;}
+    if(ev.target.closest('[data-gogoff]')){wearGoggles(false);return;}
+    if(ev.target.closest('[data-wpower]')){wPower();return;}
+    if(ev.target.closest('[data-pen]'))WD={kind:'pen'};
+    else if(ev.target.closest('[data-spray]')){const sp=W.sp||SREST;WD={kind:'spray',ox:p.x-sp.x,oy:p.y-sp.y,sx:p.x,sy:p.y,moved:false};}
+    else return;
+    try{el.setPointerCapture(ev.pointerId);}catch(_){} ev.preventDefault();
+  });
+  el.addEventListener('pointermove',ev=>{
+    if(!WD||!WD.kind)return;const svg=el.querySelector('svg'),p=svgPt(svg,ev),W=S.wl;
+    if(WD.kind==='pen'){let th=Math.atan2(PV.x-p.x,PV.y-p.y)/D2R;if(p.y>PV.y-20)th=Math.sign(th)*70;th=Math.max(-70,Math.min(70,th));if(Math.abs(th)<2.5)th=0;W.th=th;}
+    else{if(!WD.moved&&Math.hypot(p.x-WD.sx,p.y-WD.sy)<6)return;WD.moved=true;W.sp={x:Math.max(60,Math.min(760,p.x-WD.ox)),y:Math.max(50,Math.min(TK.wy-60,p.y-WD.oy))};}
+    wRender();
+  });
+  const end=()=>{if(!WD||!WD.kind)return;const d=WD;WD=null;if(d.kind==='spray'&&!d.moved)spray();save();wRender();};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+  el.addEventListener('keydown',ev=>{const W=S.wl;
+    if(ev.target.closest('[data-pen]')&&(ev.key==='ArrowLeft'||ev.key==='ArrowRight')){ev.preventDefault();W.th=Math.max(-70,Math.min(70,W.th+(ev.key==='ArrowLeft'?5:-5)));save();wRender();el.querySelector('[data-pen]').focus();}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-spray]')){ev.preventDefault();spray();}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-light]')){ev.preventDefault();toggleDark();}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-gog]')){ev.preventDefault();wearGoggles(true);}
+    else if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('[data-gogoff]')){ev.preventDefault();wearGoggles(false);}});
+  $('wlaser').addEventListener('click',()=>{ac();wPower();});
+  $('sprayBtn').addEventListener('click',spray);
+  $('angChk').addEventListener('change',wRender);
+  $('recBtn').addEventListener('click',recordAngle);
+  $('recClear').addEventListener('click',()=>{S.wl.recs=[];save();renderRecs();});
+}
+function wPower(){const W=S.wl;if(!W.on&&!S.goggles){WD={msg:'앗! 레이저 지시기를 켜기 전에 레이저 보안경을 먼저 써요.'};wRender();WD=null;return;}W.on=!W.on;tone(W.on?880:440,0.08,0.06);save();wRender();}
+function recordAngle(){
+  const W=S.wl;if(!W.on||!S.dark)return;
+  if(mist<0.15){WD={msg:'분무기를 뿌려서 공기 중의 빛의 길도 보이게 한 뒤 기록해요.'};wRender();WD=null;return;}
+  const th=Math.round(Math.abs(W.th)),r=Math.round(Math.abs(refr(W.th)));
+  if(W.recs.some(x=>Math.abs(x.th-th)<5)){WD={msg:`${th}°와 비슷한 각도는 이미 기록했어요. 레이저 지시기를 움직여 다른 각도로 비춰 보세요.`};wRender();WD=null;return;}
+  W.recs.push({th,r});W.recs.sort((a,b)=>a.th-b.th);if(W.recs.length>6)W.recs.shift();tone(1200,0.1,0.06,'sine');save();renderRecs();renderWaterQ();renderSteps();
+}
+function recMini(th,r){const s=Math.sin(th*D2R),c=Math.cos(th*D2R),s2=Math.sin(r*D2R),c2=Math.cos(r*D2R),L=44;
+  return `<svg viewBox="0 0 110 90" class="recmini" aria-hidden="true"><rect y="0" width="110" height="40" fill="#f4f8fb"/><rect y="40" width="110" height="50" fill="#cfe7f6"/><path d="M55 4 V86" stroke="#9aa6ae" stroke-dasharray="3 3"/>
+   <path d="M${f(55-s*L)} ${f(40-c*L)} L55 40 L${f(55+s2*L)} ${f(40+c2*L)}" fill="none" stroke="#e02424" stroke-width="2.4" stroke-linejoin="round"/>
+   ${th>0?`<path d="M55 40 L${f(55+s*L)} ${f(40+c*L)}" stroke="#e02424" stroke-width="1.2" stroke-dasharray="3 3" opacity=".55"/>`:''}</svg>`;}
+function renderRecs(){
+  const R=S.wl.recs;
+  $('recBody').innerHTML=R.length?R.map((x,i)=>`<tr><td>${i+1}</td><td>${recMini(x.th,x.r)}</td><td><b>${x.th}°</b></td><td><b>${x.r}°</b></td><td>${x.th===0?'수직으로 비추니 <b>꺾이지 않고 그대로</b> 나아갔어요.':`공기와 물의 경계에서 <b>꺾여</b> 나아갔어요. (${x.th-x.r}° 꺾임)`}</td></tr>`).join('')
+    :'<tr><td colspan="5" class="hint" style="text-align:center">아직 기록한 각도가 없어요. 실험대에서 ‘이 각도 기록하기’를 눌러요.</td></tr>';
+  const need=recReady();$('recNeed').innerHTML=`기록한 각도 ${R.length}개 ${R.length>=3?'✓':'(3개 이상)'} · 수직(0°)으로 비추기 ${R.some(x=>x.th===0)?'✓':'○'} · 30° 넘게 비스듬히 비추기 ${R.some(x=>x.th>=30)?'✓':'○'}`;
+}
+const recReady=()=>{const R=S.wl.recs;return R.length>=3&&R.some(x=>x.th===0)&&R.some(x=>x.th>=30);};
+function waterMini(mode){const a={x:30,y:8},p={x:80,y:50};let e;
+  if(mode==='straight')e={x:122,y:92};else if(mode==='toward')e={x:102,y:104};else e={x:154,y:80};
+  return `<svg viewBox="0 0 160 110" class="qmini" aria-hidden="true"><rect width="160" height="50" fill="#f4f8fb"/><rect y="50" width="160" height="60" fill="#cfe7f6"/><path d="M80 4 V106" stroke="#9aa6ae" stroke-dasharray="3 3"/>
+    <path d="M${a.x} ${a.y} L${p.x} ${p.y} L${e.x} ${e.y}" fill="none" stroke="#e02424" stroke-width="2.6" stroke-linejoin="round"/></svg>`;}
+const WQ={pics:[['straight','그대로 곧게 나아가요'],['toward','경계에서 꺾여 수직선 쪽으로 나아가요'],['away','경계에서 꺾여 수면 쪽으로 나아가요']],ans:'toward',
+  s1:{pre:'빛이 공기에서 물로 비스듬히 나아갈 때 공기와 물의 경계에서',opts:['꺾여 나아갑니다','꺾이지 않고 그대로 나아갑니다'],ans:'꺾여 나아갑니다'},
+  s2:{pre:'빛을 물의 표면에 수직으로 비추면',opts:['꺾여 나아갑니다','꺾이지 않고 그대로 나아갑니다'],ans:'꺾이지 않고 그대로 나아갑니다'}};
+function waterItems(){const a=S.qa.water||{};return [a.pic===WQ.ans,a.s1===WQ.s1.ans,a.s2===WQ.s2.ans];}
+function renderWaterQ(){
+  const a=S.qa.water||(S.qa.water={}),g=S.qg.water,ready=recReady();
+  $('q_water').innerHTML=`<div class="picchoices">${WQ.pics.map(([m,t])=>{let cls='picchoice';if(g&&a.pic===m)cls+=m===WQ.ans?' right':' wrong';
+      return `<button type="button" class="${cls}" data-wq="pic|${m}" aria-pressed="${a.pic===m}" ${ready?'':'disabled'}>${waterMini(m)}<span>${t}</span></button>`;}).join('')}</div>
+    <div class="sentence">• ${WQ.s1.pre} ( <span class="blank">${choiceBtns(WQ.s1.opts,a.s1,'data-wq="s1" data-v',g,WQ.s1.ans,!ready)}</span> ).</div>
+    <div class="sentence">• ${WQ.s2.pre} ( <span class="blank">${choiceBtns(WQ.s2.opts,a.s2,'data-wq="s2" data-v',g,WQ.s2.ans,!ready)}</span> ).</div>`;
+  $('qlock_water').textContent=ready?'기록한 결과를 보고 골라요.':'수직(0°), 30° 넘는 각도를 포함해 3개 이상의 각도를 기록하면 풀 수 있어요.';
+  $('qgrade_water').disabled=!ready;
+  if(g){const r=waterItems(),ok=r.filter(Boolean).length;$('qfb_water').innerHTML=`<div class="fb ${ok===3?'ok':'bad'}"><span class="ox ${ok===3?'o':'x'}">${ok===3?'O':'X'}</span>${ok===3?'모두 맞았어요! 빛은 공기에서 물로 비스듬히 들어갈 때 경계에서 꺾여 나아가고, 수직으로 들어가면 그대로 나아가요.':`3개 중 ${ok}개 맞았어요. 결과 표의 그림을 다시 살펴보세요.`}</div>`;}
+  else $('qfb_water').innerHTML='';
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-wq]');if(!b||b.disabled)return;const [f2,m]=b.dataset.wq.split('|');const a=S.qa.water||(S.qa.water={});a[f2]=m||b.dataset.v;S.qg.water=false;save();renderWaterQ();renderSteps();});
+$('qgrade_water').addEventListener('click',()=>{const a=S.qa.water||{};if(!a.pic||!a.s1||!a.s2){$('qfb_water').innerHTML='<div class="fb bad">그림과 두 문장을 모두 골라 주세요.</div>';return;}S.qg.water=true;save();renderWaterQ();renderSteps();});
+
+/* ================= 정리·평가 ================= */
+const TERM={pre:'빛이 서로 다른 물질의 경계에서 꺾여 나아가는 현상을 빛의',opts:['굴절','반사','직진'],ans:'굴절',post:'이라고 합니다.'};
+const MODEL='빛은 공기와 렌즈, 공기와 물처럼 서로 다른 물질의 경계를 비스듬히 지날 때 꺾여 나아갑니다. 이것을 빛의 굴절이라고 합니다. 볼록 렌즈를 통과한 빛은 가운데 쪽으로 꺾여 모이고, 오목 렌즈를 통과한 빛은 바깥쪽으로 꺾여 퍼집니다. 빛을 물의 표면에 수직으로 비추면 꺾이지 않고 그대로 나아갑니다.';
+function renderSummary(){
+  if($('summary').value!==S.summary)$('summary').value=S.summary;
+  const a=S.qa.term,g=S.qg.term;
+  $('termQ').innerHTML=`<div class="sentence">• ${TERM.pre} ( <span class="blank">${choiceBtns(TERM.opts,a,'data-term',g,TERM.ans)}</span> )${TERM.post}</div>${g?`<div class="fb ${a===TERM.ans?'ok':'bad'}"><span class="ox ${a===TERM.ans?'o':'x'}">${a===TERM.ans?'O':'X'}</span>${a===TERM.ans?'맞아요! 이번 실험은 빛의 굴절 실험이었어요.':'다시 생각해 봐요. 탐구 활동의 제목을 떠올려 보세요.'}</div>`:''}`;
+  if(S.sumShown){const t=S.summary.replace(/\s/g,'');const item=(ok,txt)=>`<li>${ok?'<b style="color:var(--ok)">✓</b>':'<span style="color:var(--muted)">○</span>'} ${txt}</li>`;
+    $('sumFb').innerHTML=`<div class="panel qblock"><b style="font-family:var(--display);font-weight:400;font-size:1.1rem">내 답에 이런 내용이 들어 있나요?</b>
+     <ul style="margin:0;padding-left:1em;list-style:none;display:flex;flex-direction:column;gap:4px">${item(/꺾/.test(t)||/굴절/.test(t),'빛이 서로 다른 물질의 경계에서 꺾여 나아가요.')}${item(/볼록|오목|렌즈/.test(t),'렌즈를 통과한 빛이 모이거나 퍼져요.')}${item(/수직|그대로/.test(t),'수직으로 비추면 그대로 나아가요.')}</ul>
+     <div class="model"><b>예시 답</b><br>${MODEL}</div><span class="hint">스스로 확인하는 문항이에요. 예시 답과 비교해서 빠진 내용을 보충해 보세요.</span></div>`;}
+  else $('sumFb').innerHTML='';
+  const SE=[['지식·이해','렌즈와 물에 비춘 빛을 관찰해 빛의 성질을 설명할 수 있어요.'],['과정·기능','렌즈와 물을 통과한 빛이 나아가는 모습을 그림으로 나타낼 수 있어요.'],['가치·태도','빛의 성질에 대해 호기심을 가졌어요.']];
+  const FACES=[['잘함','M8 14 Q12 18 16 14'],['보통','M8 15 H16'],['노력할래요','M8 16 Q12 12.5 16 16']];
+  $('selfEval').innerHTML=SE.map((s,i)=>`<div class="se"><span class="k">${s[0]}</span><span>${s[1]}</span><div class="faces" role="group" aria-label="${s[0]} 스스로 평가">${FACES.map((fc,j)=>`<button type="button" class="face" data-self="${i}|${j}" aria-pressed="${S.self[i]===j}"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff6d6" stroke="#5a4a1a" stroke-width="1.4"/><circle cx="8.6" cy="9.8" r="1.2" fill="#5a4a1a"/><circle cx="15.4" cy="9.8" r="1.2" fill="#5a4a1a"/><path d="${fc[1]}" fill="none" stroke="#5a4a1a" stroke-width="1.5" stroke-linecap="round"/></svg>${fc[0]}</button>`).join('')}</div></div>`).join('');
+  const items=[];if(S.qg.vx)items.push(...lensItems('vx'));if(S.qg.cc)items.push(...lensItems('cc'));if(S.qg.water)items.push(...waterItems());if(S.qg.term)items.push(S.qa.term===TERM.ans);
+  $('scoreBoard').innerHTML=`<div><div class="score">${items.filter(Boolean).length}<span style="font-size:1.2rem;color:var(--muted)"> / 10</span></div><span class="hint">채점 문항 맞은 개수 ${items.length<10?`(채점한 문항 ${items.length}개)`:''}</span></div>
+   <ul style="margin:0;padding-left:1.1em;flex:1;min-width:220px">
+    <li>준비물 알아보기: ${SUPPLIES.filter(s=>S.seen[s.id]).length} / ${SUPPLIES.length}가지</li>
+    <li>볼록 렌즈 관찰 ${lensDone('vx')?'✓':'○'} · 오목 렌즈 관찰 ${lensDone('cc')?'✓':'○'}</li>
+    <li>우유 ${S.milk.drops}방울 · 젓기 ${Math.round(Math.min(1,S.milk.stir)*100)}%</li>
+    <li>물에 비춘 각도 기록: ${S.wl.recs.length}개</li>
+    <li>정리해요: ${S.summary.trim()?'썼어요':'아직 안 썼어요'} · 스스로 평가 ${Object.keys(S.self).length} / 3</li></ul>`;
+}
+document.addEventListener('click',e=>{let b;
+  if((b=e.target.closest('[data-term]'))){S.qa.term=b.dataset.term;S.qg.term=false;save();renderSummary();}
+  else if((b=e.target.closest('[data-self]'))){const [i,j]=b.dataset.self.split('|').map(Number);S.self[i]=j;save();renderSummary();renderSteps();}});
+$('termGrade').addEventListener('click',()=>{if(!S.qa.term)return;S.qg.term=true;save();renderSummary();});
+$('summary').addEventListener('input',e=>{S.summary=e.target.value;save();});
+$('sumCheck').addEventListener('click',()=>{if(!S.summary.trim()){$('sumFb').innerHTML='<div class="fb bad">먼저 내 생각을 써 보세요.</div>';return;}S.sumShown=true;save();renderSummary();});
+
+$('resetBtn').addEventListener('click',()=>{$('resetConfirm').hidden=false;});
+$('resetNo').addEventListener('click',()=>{$('resetConfirm').hidden=true;});
+$('resetYes').addEventListener('click',()=>{S=fresh();MD=null;WD=null;save();$('resetConfirm').hidden=true;go(0);});
+
+function renderAll(){renderSteps();renderSupplies();renderEnv();milkRender();renderRecs();renderWaterQ();renderSummary();}
+['vx','cc'].forEach(buildLens);buildMilk();buildWater();
+document.querySelectorAll('[data-scene]').forEach(s=>s.hidden=(+s.dataset.scene!==S.step));
+renderAll();
+
+})();
+</script>
+</body>
+</html>
